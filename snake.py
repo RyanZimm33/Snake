@@ -58,7 +58,8 @@ def game_loop(screen, clock, settings):
 
 def game_setup(settings):
 
-    Game_Mode = 2
+    Game_Mode = settings['Gamemode']
+    difficulty = settings['Difficulty']
     cell_size = 40
     blocks_x = int(screen_width / cell_size)
     blocks_y = int(screen_height / cell_size)
@@ -116,26 +117,173 @@ def handle_events(players):
 
     return True
 
-
 def game_intro(screen):
     """Starting screen. Displays the game's name, controls, and anything else needed."""
-    myfont = pygame.font.SysFont("Britannic Bold", 40)
-    myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+    settings = {"Gamemode": 0, "Difficulty": 0}
+    big = pygame.font.SysFont("Britannic Bold", 40)
+    small = pygame.font.SysFont("Britannic Bold", 30)
 
-    title = myfont.render("Snake, but actually Tron", 1, (255, 0, 0))
-    under = myfont2.render("Press Space to Begin", 1, (255, 0, 0))
-
-    screen.blit(title, (30, 30))
-    screen.blit(under, (30, 80))
-    pygame.display.flip()
+    title = big.render("Snake, but actually Tron", 1, (255, 0, 0))
 
     intro = True
     while intro:
+        #Draws buttons, color changes if mouse is hovering over
+        mouse = pygame.mouse.get_pos()
+        if 30 <= mouse[0] <= 100 and 90 <= mouse[1] <= 130:
+            pygame.draw.rect(screen,(255,0,0),(30, 90 , 70, 40))
+            startT = small.render("Start", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(30, 90 , 70, 40))
+            startT = small.render("Start", 1, (255, 0, 0))
+
+        if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
+            pygame.draw.rect(screen,(255,0,0),(120, 90 , 100, 40))
+            settingsT = small.render("Options", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(120, 90 , 100, 40))
+            settingsT = small.render("Options", 1, (255, 0, 0))
+
+        if 240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130:
+            pygame.draw.rect(screen,(255,0,0),(240, 90 , 60, 40))
+            exitT = small.render("Exit", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(240, 90 , 60, 40))
+            exitT = small.render("Exit", 1, (255, 0, 0))
+
+        screen.blit(title, (30, 30))
+        screen.blit(startT, (40, 100))
+        screen.blit(settingsT, (130, 100))
+        screen.blit(exitT, (250, 100))
+
+        #Button events
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #Start
+                if 30 <= mouse[0] <= 90 and 90 <= mouse[1] <= 130:
                     intro = False
                     screen.fill((0, 0, 0))
+                    return settings
+                #Options
+                if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
+                    settings = optionScreen(screen)
+
+                #Exit
+                if 240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130:
+                    pygame.quit()
+
+        pygame.display.update()
+
+def optionScreen(screen):
+    settings = {"Gamemode": 0, "Difficulty": 0}
+    screen.fill((0, 0, 0))
+
+    big = pygame.font.SysFont("Britannic Bold", 40)
+    small = pygame.font.SysFont("Britannic Bold", 30)
+
+    optionT = big.render("Options", 1, (255, 0, 0))
+    diffSelction = small.render("Difficulty: Easy" , 1, (255,0,0))
+    gameSelction = small.render("Gamemode: Snake" , 1, (255,0,0))
+
+
+    while True:
+        screen.fill((0,0,0))
+        #Draws buttons, color changes if mouse is hovering over
+        mouse = pygame.mouse.get_pos()
+        if 30 <= mouse[0] <= 100 and 90 <= mouse[1] <= 130:
+            pygame.draw.rect(screen,(255,0,0),(30, 90 , 70, 40))
+            diff1 = small.render("Easy", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(30, 90 , 70, 40))
+            diff1 = small.render("Easy", 1, (255, 0, 0))
+
+        if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
+            pygame.draw.rect(screen,(255,0,0),(120, 90 , 100, 40))
+            diff2 = small.render("Medium", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(120, 90 , 100, 40))
+            diff2 = small.render("Medium", 1, (255, 0, 0))
+
+        if 240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130:
+            pygame.draw.rect(screen,(255,0,0),(240, 90 , 60, 40))
+            diff3 = small.render("Hard", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(240, 90 , 60, 40))
+            diff3 = small.render("Hard", 1, (255, 0, 0))
+
+        if 30 <= mouse[0] <= 100 and 150 <= mouse[1] <= 190:
+            pygame.draw.rect(screen,(255,0,0),(30, 150 , 70, 40))
+            game1 = small.render("Snake", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(30, 150 , 70, 40))
+            game1 = small.render("Snake", 1, (255, 0, 0))
+
+        if 120 <= mouse[0] <= 220 and 150 <= mouse[1] <= 190:
+            pygame.draw.rect(screen,(255,0,0),(120, 150 , 100, 40))
+            game2 = small.render("Multi", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(120, 150 , 100, 40))
+            game2 = small.render("Multi", 1, (255, 0, 0))
+
+        if 240 <= mouse[0] <= 300 and 150 <= mouse[1] <= 190:
+            pygame.draw.rect(screen,(255,0,0),(240, 150 , 60, 40))
+            game3 = small.render("CPU", 1, (255, 255, 255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(240, 150 , 60, 40))
+            game3 = small.render("CPU", 1, (255, 0, 0))
+
+        if 30 <= mouse[0] <= 100 and 250 <= mouse[1] <= 290:
+            pygame.draw.rect(screen,(255,0,0),(30, 250 , 70, 40))
+            exitT = small.render("Exit", 1, (255,255,255))
+        else:
+            pygame.draw.rect(screen,(255,255,255),(30, 250 , 70, 40))
+            exitT = small.render("Exit", 1, (255,0,0))
+
+
+        screen.blit(optionT, (30, 30))
+        screen.blit(diff1, (40, 100))
+        screen.blit(diff2, (130, 100))
+        screen.blit(diff3, (250, 100))
+        screen.blit(game1, (40, 160))
+        screen.blit(game2, (130, 160))
+        screen.blit(game3, (250, 160))
+        screen.blit(diffSelction, (320, 100))
+        screen.blit(gameSelction, (320, 160))
+        screen.blit(exitT, (40, 260))
+
+        #Button events
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #Easy
+                if 30 <= mouse[0] <= 90 and 90 <= mouse[1] <= 130:
+                    settings["Difficulty"] = 0
+                    diffSelction = small.render(("Difficulty: Easy" ), 1, (255,0,0))
+                #Medium
+                if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
+                    settings["Difficulty"] = 1
+                    diffSelction = small.render(("Difficulty: Medium" ), 1, (255,0,0))
+                #Hard
+                if 240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130:
+                    settings["Difficulty"] = 2
+                    diffSelction = small.render(("Difficulty: Hard" ), 1, (255,0,0))
+
+                #Snake gamemode
+                if 30 <= mouse[0] <= 90 and 150 <= mouse[1] <= 190:
+                    settings["Gamemode"] = 0
+                    gameSelction = small.render(("Gamemode: Snake" ), 1, (255,0,0))
+                #Tron/Multiplayer gamemode
+                if 120 <= mouse[0] <= 220 and 150 <= mouse[1] <= 190:
+                    settings["Gamemode"] = 1
+                    gameSelction = small.render(("Gamemode: Multi" ), 1, (255,0,0))
+                #CPU gamemode
+                if 240 <= mouse[0] <= 300 and 150 <= mouse[1] <= 190:
+                    settings["Gamemode"] = 2
+                    gameSelction = small.render(("Gamemode: CPU" ), 1, (255,0,0))
+                #Exit button
+                if 30 <= mouse[0] <= 100 and 250 <= mouse[1] <= 290:
+                    screen.fill((0,0,0))
+                    return settings
+
+        pygame.display.update()
 
 def end_screen(screen, stats):
     if (len(stats) > 1):
@@ -500,6 +648,25 @@ class NPCController:
             return 'left'
         elif n < turn_chance:
             return 'right'
+
+
+def NPC_algo(fruit, snake):
+    dX = fruit.x - snake.X
+    dY = fruit.y - snake.Y
+
+    probRight = (dX / (dX + dY))
+    probUp = (dY / (dY + dX))
+
+    if (abs(probRight * random.random()) > abs(probUp * random.random())):
+        if probRight > 0:
+            return 'right'
+        else:
+            return 'left'
+    else:
+        if probUp > 0:
+            return 'up'
+        else:
+            return 'down'
 
 
 def index_to_pixels(x, y):
