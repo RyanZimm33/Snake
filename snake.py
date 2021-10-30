@@ -18,7 +18,7 @@ def main():
     p2 = Snake(100, 100, controls=p2controls, color=(0, 255, 0))
     players = [p1, p2]
     
-    def game_intro(screen)
+    game_intro(screen)
 
     while handle_events(players):
         clock.tick(5)
