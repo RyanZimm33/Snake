@@ -28,8 +28,8 @@ def main():
     p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
-    p1 = Snake(7, 5, map, controls=p1controls, color=(0, 0, 255))
-    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 255, 0))
+    p1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
+    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 1, 0))
     players = [p1, p2]
 
     Fruit(screen, map)
@@ -95,8 +95,17 @@ class Fruit:
 
     def drawFruit(self, screen):
         x, y = index_to_pixels(self.x, self.y)
+        '''
         fruit = pygame.Rect(x, y, cell_size, cell_size)
         pygame.draw.rect(screen, (255, 0, 0), fruit)
+        '''
+        white = (255,255,255)
+        n = cell_size/3
+        pygame.draw.rect(screen, white, (x + n, y, n, n))
+        pygame.draw.rect(screen, white, (x, y + n, n, n))
+        pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
+        pygame.draw.rect(screen, white, (x + n, y + 2*n, n, n))
+
 
     # def collision(self, xPos, yPos):
     #     if self.x * cell_size == int(xPos) and self.y * cell_size == int(yPos):
@@ -150,6 +159,11 @@ class Snake:
         self.color = color
         self.growing = False
 
+    def get_color(self):
+        r = self.color[0] or 50 + 200 * ((self.X * cell_size) / screen_width)
+        g = self.color[1] or 50 + 200 * ((self.Y * cell_size) / screen_height)
+        b = self.color[2] or 50 + 200 * ((self.X * cell_size) / screen_width)
+        return (int(r),int(g),int(b))
 
     def grow(self):
         self.growing = True
@@ -194,7 +208,9 @@ class Snake:
 
         # draw new head
         head_coord = index_to_pixels(head[0], head[1])
-        pygame.draw.rect(screen, self.color, (head_coord[0], head_coord[1], cell_size, cell_size))
+        color = (100, 255 * (head_coord[0] / screen_width), 255 * (head_coord[1] / screen_height))
+        color = self.get_color()
+        pygame.draw.rect(screen, color, (head_coord[0], head_coord[1], cell_size-1, cell_size-1))
 
         # render
         pygame.display.update()
