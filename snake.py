@@ -85,8 +85,12 @@ class Fruit:
 
     def __init__(self, screen, map):
         """Randomly place the fruit and update map to show it."""
-        self.x = random.randint(0, blocks_x - 1)
-        self.y = random.randint(0, blocks_y - 1)
+        while True:
+            self.x = random.randint(0, blocks_x - 1)
+            self.y = random.randint(0, blocks_y - 1)
+            if map[self.y][self.x] == 0:
+                break
+
         map[self.y][self.x] = 2
 
         # Render the fruit
