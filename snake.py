@@ -4,7 +4,6 @@ import pygame
 screen_size = (800, 600)
 
 
-# While loop section
 def main():
     """Start game."""
     global pygame
@@ -13,9 +12,9 @@ def main():
     screen = pygame.display.set_mode(screen_size)
 
     p1 = Snake((400, 300), pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d)
+    players = [p1]
 
-    running = True
-    while running:
+    while handle_events(players):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -26,8 +25,29 @@ def main():
 
         pygame.display.update()
 
+def handle_events(players):
+    """Iterate through events and send them to their proper handlers.
 
-# Snake class section
+    Parameters
+    ----------
+    players : list
+        List of snake players.
+    """
+    running = True
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            break
+        elif event.type == pygame.KEYDOWN:
+            for p in players:
+                try:
+                    p.ch_dir[event.key]()
+                except KeyError:
+                    pass
+
+    return running
+
+
 class Snake:
     """A snake with its own length and position."""
 
