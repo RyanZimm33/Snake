@@ -121,8 +121,7 @@ class Snake:
                 controls[0]: self.up,
                 controls[1]: self.down,
                 controls[2]: self.left,
-                controls[3]: self.right,
-                pygame.K_g: self.grow    # Debug
+                controls[3]: self.right
             }
         except TypeError:
             # No controls were given.
