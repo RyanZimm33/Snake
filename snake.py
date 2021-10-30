@@ -88,8 +88,15 @@ def handle_events(players):
 
 class Fruit:
     def __init__(self, screen, map):
-        self.x = random.randint(0, blocks_x - 1)
-        self.y = random.randint(0, blocks_y - 1)
+
+        while True:
+            self.x = random.randint(0, blocks_x - 1)
+            self.y = random.randint(0, blocks_y - 1)
+            if map[self.y][self.x] != 0:
+                continue
+            else:
+                break
+
         map[self.y][self.x] = 2
         self.drawFruit(screen)
 
