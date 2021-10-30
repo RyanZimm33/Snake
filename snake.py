@@ -129,7 +129,7 @@ def game_intro(screen):
     big = pygame.font.SysFont("Britannic Bold", 40)
     small = pygame.font.SysFont("Britannic Bold", 30)
 
-    title = big.render("Snake, but actually Tron", 1, (255, 0, 0))
+    title = big.render("Space Snakes", 1, (255, 0, 0))
 
     intro = True
     while intro:
