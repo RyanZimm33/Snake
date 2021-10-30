@@ -20,6 +20,8 @@ def main():
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
+    game_intro(screen)
+
     map = [[0 for x in range(blocks_x)] for y in range(blocks_y)]
 
     # Up, down, left, right
@@ -29,22 +31,21 @@ def main():
     p1 = Snake(7, 5, map, controls=p1controls, color=(0, 0, 255))
     p2 = Snake(1, 1, map, controls=p2controls, color=(0, 255, 0))
     players = [p1, p2]
-    fruit = Fruit()
 
-    game_intro(screen)
+    Fruit(screen, map)
 
     while handle_events(players):
         # DEBUG
         clock.tick(5)
         for p in players:
-            p.move()
+            p.move(screen)
             p.draw(screen)
 
-        fruit.drawFruit(screen)
-        if(fruit.collision(p1.getX(), p1.getY())):
-            p1.grow()
-        if(fruit.collision(p2.getX(), p2.getY())):
-            p2.grow()
+        # fruit.drawFruit(screen)
+        # if(fruit.collision(p1.getX(), p1.getY())):
+        #     p1.grow()
+        # if(fruit.collision(p2.getX(), p2.getY())):
+        #     p2.grow()
         pygame.display.update()
 
 def game_intro(screen):
@@ -86,21 +87,24 @@ def handle_events(players):
     return True
 
 class Fruit:
-    def __init__(self):
-        self.x = random.randint(0, cell_width_count - 1)
-        self.y = random.randint(0, cell_height_count - 1)
+    def __init__(self, screen, map):
+        self.x = random.randint(0, blocks_x - 1)
+        self.y = random.randint(0, blocks_y - 1)
+        map[self.y][self.x] = 2
+        self.drawFruit(screen)
 
     def drawFruit(self, screen):
-        fruit = pygame.Rect(self.x * cell_size, self.y * cell_size, 50, 50)
-        pygame.draw.rect(screen ,(255, 0, 0), fruit)
+        x, y = index_to_pixels(self.x, self.y)
+        fruit = pygame.Rect(x, y, cell_size, cell_size)
+        pygame.draw.rect(screen, (255, 0, 0), fruit)
 
-    def collision(self, xPos, yPos):
-        if self.x * cell_size == int(xPos) and self.y * cell_size == int(yPos):
-            self.x = random.randint(0, cell_width_count - 1)
-            self.y = random.randint(0, cell_height_count - 1)
-            return True
-        else:
-            return False
+    # def collision(self, xPos, yPos):
+    #     if self.x * cell_size == int(xPos) and self.y * cell_size == int(yPos):
+    #         self.x = random.randint(0, cell_width_count - 1)
+    #         self.y = random.randint(0, cell_height_count - 1)
+    #         return True
+    #     else:
+    #         return False
 
 
 
@@ -151,7 +155,7 @@ class Snake:
         self.growing = True
 
 
-    def move(self):
+    def move(self, screen):
         """Move one position."""
         # The new coord modulo the max coord. This means the snake will wrap back to zero.
         new_X = (self.X + self.dX) % blocks_x
@@ -163,6 +167,8 @@ class Snake:
             return None
         elif obstacle == 2:
             print('Apple Collision')
+            Fruit(screen, self.map)
+            self.growing = True
 
         self.X = new_X
         self.Y = new_Y
