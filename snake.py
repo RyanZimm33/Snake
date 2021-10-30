@@ -29,6 +29,7 @@ def main():
     pNPC = SnakeNPC(8, 8, map)
     players = [p1, p2, pNPC]
 
+    # BigFruit(screen, map)
     Fruit(screen, map)
 
     try:
@@ -49,6 +50,8 @@ def main():
         if str(e) == "Game Over":
             # end_screen will return True if user restarts.
             return end_screen(screen, p1, p2)
+        else:
+            raise e
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -145,13 +148,16 @@ class Fruit:
 
     def __init__(self, screen, map):
         """Randomly place the fruit and update map to show it."""
+        self.map = map
+        self.screen = screen
+
         while True:
             self.x = random.randint(0, blocks_x - 1)
             self.y = random.randint(0, blocks_y - 1)
             if map[self.y][self.x] == 0:
                 break
 
-        map[self.y][self.x] = 2
+        map[self.y][self.x] = self
 
         # Render the fruit
         x, y = index_to_pixels(self.x, self.y)
@@ -165,6 +171,78 @@ class Fruit:
         pygame.draw.rect(screen, white, (x, y + n, n, n))
         pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
         pygame.draw.rect(screen, white, (x + n, y + 2*n, n, n))
+
+    def eat(self):
+        """This fruit has been destroyed. Create a new Fruit."""
+        Fruit(self.screen, self.map)
+
+class BigFruit(Fruit):
+    """A bigger fruit that is easier to hit."""
+    size = 3
+
+    def __init__(self, screen, map):
+        """Randomly place the fruit and update map to show it."""
+        self.map = map
+        self.screen = screen
+
+        while True:
+            try_again = False
+            self.x = random.randint(0, blocks_x - 1)
+            self.y = random.randint(0, blocks_y - 1)
+
+            # Check those new positions
+            for point in self.get_points():
+                if map[point[1]][point[0]] != 0:
+                    try_again = True
+                    break
+                elif point[0] // (blocks_x-1):
+                    # Goes over vertical edge
+                    try_again = True
+                    break
+                elif point[1] // (blocks_y-1):
+                    # Goes over horizontal edge
+                    try_again = True
+                    break
+
+            # If everything was fine
+            if not try_again:
+                break
+
+        # Update map to show these new points
+        for point in self.get_points():
+            map[point[1]][point[0]] = self
+
+        # Render the fruit
+        # The upper left corner
+        x, y = index_to_pixels(self.x, self.y)
+
+        white = (255, 255, 255)
+        n = (cell_size * self.size) / 3
+        pygame.draw.rect(screen, white, (x + n, y, n, n))
+        pygame.draw.rect(screen, white, (x, y + n, n, n))
+        pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
+        pygame.draw.rect(screen, white, (x + n, y + 2*n, n, n))
+
+    def eat(self):
+        """Destroy the fruit and create a new one."""
+        for point in self.get_points():
+            x, y = point
+            if self.map[y][x] == self:
+                self.map[y][x] = 0
+                fruit_coord = index_to_pixels(x, y)
+                pygame.draw.rect(self.screen, (0, 0, 0), (fruit_coord[0], fruit_coord[1], cell_size, cell_size))
+
+        BigFruit(self.screen, self.map)
+
+    def get_points(self):
+        """Uses the size to generate a list of xy points that the fruit will use. Returns a list of xy tuples."""
+        points = []
+        for dy in range(self.size):
+            for dx in range(self.size):
+                x = (self.x + dx) % blocks_x
+                y = (self.y + dy) % blocks_y
+                points.append((x, y))
+        return points
 
 class Snake:
     """A snake. Moves forward every cycle and contains event handlers for turning."""
@@ -265,13 +343,14 @@ class Snake:
         pygame.display.update()
 
     def collision_detect(self, obstacle, screen):
-        """Detect collisions. If apple, grow. If snake, raise Exception('Game Over')."""
+        """Detect collisions. If fruit, eat it and grow. If snake, raise Exception('Game Over')."""
         if obstacle == 1:
+            # Snake Collision
             self.loser = True
             raise Exception("Game Over")
-        elif obstacle == 2:
-            # Apple Collision
-            Fruit(screen, self.map)
+        elif isinstance(obstacle, Fruit):
+            # Fruit Collision
+            obstacle.eat()    # Basically the Fruit's deconstructor
             self.growing = True
             self.score += 1
 
