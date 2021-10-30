@@ -1,10 +1,9 @@
 import random
 import pygame
 
-
 screen_width = 800
-screen_height = 600
-cell_size = 50
+screen_height = 800
+cell_size = 40
 
 blocks_x = screen_width // cell_size
 blocks_y = screen_height // cell_size
@@ -24,14 +23,14 @@ def main():
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
     p1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
-    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 1, 0))
+    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 0, 1))
     players = [p1, p2]
 
     Fruit(screen, map)
 
     try:
         while handle_events(players):
-            clock.tick(5)
+            clock.tick(10)
             for p in players:
                 p.move(screen)
                 p.draw(screen)
@@ -210,9 +209,9 @@ class Snake:
     def get_color(self):
         """Generate a color for the head by factoring in the x and y position."""
         x, y = index_to_pixels(self.X, self.Y)
-        r = self.color[0] or 50 + 200 * (x / screen_width)
-        g = self.color[1] or 50 + 200 * (y / screen_height)
-        b = self.color[2] or 50 + 200 * (x / screen_width)
+        r = self.color[0] or 150 + 100 * (x / screen_width)
+        g = self.color[1] or 100 + 150 * (y / screen_height)
+        b = self.color[2] or 150 + 100 * (x / screen_width)
         return (int(r), int(g), int(b))
 
 
