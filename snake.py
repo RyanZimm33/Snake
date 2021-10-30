@@ -18,12 +18,27 @@ def main():
     p2 = Snake(100, 100, controls=p2controls, color=(0, 255, 0))
     players = [p1, p2]
 
+    game_intro(screen)
+
     while handle_events(players):
         clock.tick(5)
         for p in players:
             p.move()
             p.draw(screen)
 
+        pygame.display.update()
+
+def game_intro(screen):
+    intro =True
+    while (intro):
+        myfont = pygame.font.SysFont("Britannic Bold", 40)
+        nlabel = myfont.render("Welcome ", 1, (255, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    intro = False
+        screen.blit(nlabel,(200,200))
+        pygame.display.flip()
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
