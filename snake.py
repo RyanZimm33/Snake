@@ -68,6 +68,9 @@ class Snake:
         self.body.append(self.xy)
         old_xy = self.body.pop(0)
 
+        # Draw new rectangle at self.xy
+        # Delete old rectangle at old_xy
+
         print(self.body)
 
 
