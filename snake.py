@@ -69,6 +69,13 @@ def game_setup(settings):
 
     controllers = []
 
+    if (difficulty == 0):
+        constants.speed = 3
+    elif (difficulty == 1):
+        constants.speed = 2
+    elif (difficulty == 2):
+        constants.speed = 1
+
     if (Game_Mode == 0):
         player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
         players = [player]
