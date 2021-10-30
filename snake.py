@@ -1,14 +1,20 @@
 import pygame
 
+
 screen_width = 800
 screen_height = 600
-clock = pygame.time.Clock()
+cell_size = 50
+
 
 def main():
     """Start game."""
-    global pygame
 
     screen = pygame.display.set_mode((screen_width, screen_height))
+    clock = pygame.time.Clock()
+
+    blocks_x = screen_width // cell_size
+    blocks_y = screen_height // cell_size
+    map = [[0 for x in range(blocks_x)] for y in range(blocks_y)]
 
     # Up, down, left, right
     p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
@@ -38,6 +44,8 @@ def handle_events(players):
         if event.type == pygame.QUIT:
             return False
         elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                return False
             for p in players:
                 try:
                     p.ch_dir[event.key]()
@@ -84,10 +92,9 @@ class Snake:
 
     def move(self):
         """Move one position."""
-        global screen_size
 
-        self.X = (self.X + self.dX * 50) % screen_width
-        self.Y = (self.Y + self.dY * 50) % screen_height
+        self.X = (self.X + self.dX * cell_size) % screen_width
+        self.Y = (self.Y + self.dY * cell_size) % screen_height
 
         self.body.append((self.X, self.Y))
         self.tail = self.body.pop(0)
@@ -99,9 +106,9 @@ class Snake:
         black = (0,0,0)
 
         # erase tail
-        pygame.draw.rect(screen, black, (tail[0], tail[1], 50, 50))
+        pygame.draw.rect(screen, black, (tail[0], tail[1], cell_size-1, cell_size-1))
         # draw new head
-        pygame.draw.rect(screen, self.color, (head[0], head[1], 50, 50))
+        pygame.draw.rect(screen, self.color, (head[0], head[1], cell_size-1, cell_size-1))
 
 
     def up(self):
@@ -129,6 +136,9 @@ class Snake:
 
 
 if __name__ == '__main__':
+    if (screen_width % cell_size) or (screen_height % cell_size):
+        raise Exception('screen_width and screen_height must be divisible by cell_size')
+
     pygame.init()
 
     main()
