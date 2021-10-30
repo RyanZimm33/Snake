@@ -41,8 +41,10 @@ def main():
             p.draw(screen)
 
         fruit.drawFruit(screen)
-        fruit.collision(p1.getX(), p1.getY())
-        fruit.collision(p2.getX(), p2.getY())
+        if(fruit.collision(p1.getX(), p1.getY())):
+            p1.grow()
+        if(fruit.collision(p2.getX(), p2.getY())):
+            p2.grow()
         pygame.display.update()
 
 def game_intro(screen):
@@ -92,6 +94,10 @@ class Fruit:
         if self.x * cell_size == int(xPos) and self.y * cell_size == int(yPos):
             self.x = random.randint(0, cell_width_count - 1)
             self.y = random.randint(0, cell_height_count - 1)
+            return True
+        else:
+            return False
+
 
 
 class Snake:
@@ -154,7 +160,7 @@ class Snake:
         black = (0,0,0)
 
         # erase tail
-        pygame.draw.rect(screen, black, (tail[0], tail[1], cell_size-1, cell_size-1))
+        pygame.draw.rect(screen, black, (tail[0], tail[1], cell_size, cell_size))
         # draw new head
         pygame.draw.rect(screen, self.color, (head[0], head[1], cell_size-1, cell_size-1))
         # render
