@@ -591,6 +591,25 @@ class SnakeNPC(Snake):
             self.score += 1
 
 
+def NPC_algo(fruit, snake):
+    dX = fruit.x - snake.X
+    dY = fruit.y - snake.Y
+
+    probRight = (dX / (dX + dY))
+    probUp = (dY / (dY + dX))
+
+    if (abs(probRight * random.random()) > abs(probUp * random.random())):
+        if probRight > 0:
+            return 'right'
+        else:
+            return 'left'
+    else:
+        if probUp > 0:
+            return 'up'
+        else:
+            return 'down'
+
+
 def index_to_pixels(x, y):
     """Convert the index coordinates to pixel coordinates. Returns (x, y) in pixels."""
     new_x = x * cell_size
