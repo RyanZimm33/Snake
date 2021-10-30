@@ -31,6 +31,7 @@ def game_loop(screen, clock, settings):
                 clock.tick(blocks_x / speed)
                 for player in players:
                     player.move(screen)
+                    show_score(player.score_coords, player.score, screen)
                     player.draw(screen)
 
                 #show_score(10, 10, p1.score, screen)
@@ -62,14 +63,14 @@ def game_setup(settings):
     # 2 : Play vs. NPC
 
     if (Game_Mode == 0):
-        player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
+        player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
         players = [player]
     elif (Game_Mode == 1):
-        player1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
-        player2 = Snake(1, 1, map, controls=p2controls, color=(0, 0, 1))
+        player1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
+        player2 = Snake(1, 1, map, controls=p2controls, color=(0, 0, 1), score_coords=(770,10))
         players = [player1, player2]
     elif (Game_Mode == 2):
-        player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
+        player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
         playerNPC = SnakeNPC(8,8, map)  # add easy, medium, hard
         players = [player, playerNPC]
 
@@ -159,7 +160,8 @@ def end_screen(screen, stats):
                 elif event.key == pygame.K_r:
                     return True
 
-def show_score(x, y, score, screen):
+def show_score(score_coords, score, screen):
+    x, y = score_coords
     """Display score to the corners of the screen."""
     blocker = pygame.Rect(x, y, 60, 60)
     pygame.draw.rect(screen, (0, 0, 0), blocker)
@@ -197,7 +199,7 @@ class Fruit:
 class Snake:
     """A snake. Moves forward every cycle and contains event handlers for turning."""
 
-    def __init__(self, X, Y, map, *, controls=None, color=(255, 255, 255)):
+    def __init__(self, X, Y, map, *, controls=None, color=(255, 255, 255), score_coords=(10,10)):
         """Create a snake at x, y. Update the map to include it's position. Use controls and color if given.
 
         Parameters
@@ -238,6 +240,7 @@ class Snake:
         self.growing = False
         self.loser = False
         self.score = 1
+        self.score_coords = score_coords
 
     def get_color(self):
         """Generate a color for the head by factoring in the x and y position."""
