@@ -205,7 +205,7 @@ class Snake:
         self.color = color
         self.growing = False
         self.loser = False
-        self.score = 0
+        self.score = 1
 
     def get_color(self):
         """Generate a color for the head by factoring in the x and y position."""
