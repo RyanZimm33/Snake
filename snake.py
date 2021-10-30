@@ -7,7 +7,6 @@ clock = pygame.time.Clock()
 def main():
     """Start game."""
     global pygame
-    global screen_size
 
     screen = pygame.display.set_mode((screen_width, screen_height))
 
@@ -93,18 +92,12 @@ class Snake:
         self.X = (self.X + self.dX * 50) % screen_width
         self.Y = (self.Y + self.dY * 50) % screen_height
 
-        # new_x = (self.xy[0] + self.velocity[0]) % screen_size[0]
-        # new_y = (self.xy[1] + self.velocity[1]) % screen_size[1]
-
         self.body.append((self.X, self.Y))
 
         if not (self.growing):
             self.tail = self.body.pop(0)
         else:
             self.growing = False
-
-        # Draw new rectangle at self.xy
-        # Delete old rectangle at old_xy
 
 
     def draw(self, screen):
@@ -123,21 +116,24 @@ class Snake:
 
 
     def up(self):
-        """Move up."""
-        self.dX, self.dY = 0, -1
+        """Change direction to up."""
+        if not (self.dY == 1):
+            self.dX, self.dY = 0, -1
 
     def down(self):
-        """Move down."""
-        self.dX, self.dY = 0, 1
+        """Change direction to down."""
+        if not (self.dY == -1):
+            self.dX, self.dY = 0, 1
 
     def left(self):
-        """Move left."""
-        self.dX, self.dY = -1, 0
+        """Change direction to left."""
+        if not (self.dX == 1):
+            self.dX, self.dY = -1, 0
 
     def right(self):
-        """Move right."""
-        self.dX, self.dY = 1, 0
-
+        """Change direction to right."""
+        if not (self.dX == -1):
+            self.dX, self.dY = 1, 0
 
 
 # Random generation section
