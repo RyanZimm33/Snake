@@ -12,43 +12,67 @@ blocks_y = screen_height // cell_size
 
 
 def main():
-    """Start game."""
+    """START GAME"""
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
-    game_intro(screen)
+    settings = game_intro(screen)
+    stats = game_loop(screen, clock, settings)
+    end_screen(screen, stats)
+
+
+def game_loop(screen, clock, settings):
+        players, map = game_setup(settings)
+
+        Fruit(screen, map)
+
+        try:
+            while handle_events(players):
+                clock.tick(blocks_x / speed)
+                for player in players:
+                    player.move(screen)
+                    show_score(player.score_coords, player.score, screen)
+                    player.draw(screen)
+
+                #show_score(10, 10, p1.score, screen)
+                #show_score(770, 10, p2.score, screen)
+
+                pygame.display.update()
+        except Exception as e:
+            # When there is a snake collision, Exception('Game Over') is thrown.
+            if str(e) == "Game Over":
+                # end_screen will return True if user restarts.
+                return players
+
+        # need players, fruit
+
+def game_setup(settings):
+
+    Game_Mode = 1
+    cell_size = 40
+    blocks_x = int(screen_width / cell_size)
+    blocks_y = int(screen_height / cell_size)
 
     map = [[0 for x in range(blocks_x)] for y in range(blocks_y)]
-
-    # Control keys in order of up, down, left, right
     p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
-    p1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
-    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 0, 1))
-    pNPC = SnakeNPC(8, 8, map)
-    players = [p1, p2, pNPC]
 
-    Fruit(screen, map)
+    if (Game_Mode == 0):
+        player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
+        players = [player]
+    elif (Game_Mode == 1):
+        player1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
+        player2 = Snake(1, 1, map, controls=p2controls, color=(0, 0, 1), score_coords=(770,10))
+        players = [player1, player2]
+    elif (Game_Mode == 2):
+        player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
+        playerNPC = SnakeNPC(8,8, map)  # add easy, medium, hard
+        players = [player, playerNPC]
 
-    try:
-        while handle_events(players):
-            clock.tick(blocks_x / speed)
-            for p in players:
-                if type(p) == SnakeNPC:
-                    p.random_ch_dir()
-                p.move(screen)
-                p.draw(screen)
+    return (players, map)
 
-            show_score(10, 10, p1.score, screen)
-            show_score(770, 10, p2.score, screen)
 
-            pygame.display.update()
-    except Exception as e:
-        # When there is a snake collision, Exception('Game Over') is thrown.
-        if str(e) == "Game Over":
-            # end_screen will return True if user restarts.
-            return end_screen(screen, p1, p2)
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -93,45 +117,48 @@ def game_intro(screen):
                     intro = False
                     screen.fill((0, 0, 0))
 
-def end_screen(screen, snake1, snake2):
-    """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
-    myfont = pygame.font.SysFont("Britannic Bold", 40)
-    myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+def end_screen(screen, stats):
+    if (len(stats) > 1):
+        snake1, snake2 = stats[0], stats[1]
+        """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
+        myfont = pygame.font.SysFont("Britannic Bold", 40)
+        myfont2 = pygame.font.SysFont("Britannic Bold", 30)
 
-    if snake1.loser and not snake2.loser:
-        winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
-    elif snake2.loser and not snake1.loser:
-        winner = myfont.render("Player 1 Wins!", 1, (255, 0,0))
-    else:
-        winner = myfont.render("Tie", 1, (255, 0,0))
+        if snake1.loser and not snake2.loser:
+            winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
+        elif snake2.loser and not snake1.loser:
+            winner = myfont.render("Player 1 Wins!", 1, (255, 0,0))
+        else:
+            winner = myfont.render("Tie", 1, (255, 0,0))
 
-    scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
-    underline  = myfont.render("__________", 1, (255,0,0))
+        scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
+        underline  = myfont.render("__________", 1, (255,0,0))
 
-    score1 = myfont2.render("Player 1: " + str(len(snake1.body)), 1, (255,0,0))
-    score2 = myfont2.render("Player 2: " + str(len(snake2.body)), 1, (255,0,0))
+        score1 = myfont2.render("Player 1: " + str(len(snake1.body)), 1, (255,0,0))
+        score2 = myfont2.render("Player 2: " + str(len(snake2.body)), 1, (255,0,0))
 
-    screen.blit(winner, (30, 30))
-    screen.blit(scoreboard, (30, 60))
-    screen.blit(underline, (30,80))
-    screen.blit(score1, (30, 110))
-    screen.blit(score2, (30, 140))
-    pygame.display.flip()
+        screen.blit(winner, (30, 30))
+        screen.blit(scoreboard, (30, 60))
+        screen.blit(underline, (30,80))
+        screen.blit(score1, (30, 110))
+        screen.blit(score2, (30, 140))
+        pygame.display.flip()
 
-    end = True
-    while end:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                end = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+        end = True
+        while end:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     end = False
-                elif event.key == pygame.K_ESCAPE:
-                    end = False
-                elif event.key == pygame.K_r:
-                    return True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        end = False
+                    elif event.key == pygame.K_ESCAPE:
+                        end = False
+                    elif event.key == pygame.K_r:
+                        return True
 
-def show_score(x, y, score, screen):
+def show_score(score_coords, score, screen):
+    x, y = score_coords
     """Display score to the corners of the screen."""
     blocker = pygame.Rect(x, y, 60, 60)
     pygame.draw.rect(screen, (0, 0, 0), blocker)
@@ -169,7 +196,7 @@ class Fruit:
 class Snake:
     """A snake. Moves forward every cycle and contains event handlers for turning."""
 
-    def __init__(self, X, Y, map, *, controls=None, color=(255, 255, 255)):
+    def __init__(self, X, Y, map, *, controls=None, color=(255, 255, 255), score_coords=(10,10)):
         """Create a snake at x, y. Update the map to include it's position. Use controls and color if given.
 
         Parameters
@@ -211,6 +238,7 @@ class Snake:
         self.already_turned = False
         self.loser = False
         self.score = 1
+        self.score_coords = score_coords
 
     def get_color(self):
         """Generate a color for the head by factoring in the x and y position."""
@@ -224,6 +252,7 @@ class Snake:
     def move(self, screen):
         """Move forward one cell. Check the map for collisions with snakes or fruits."""
         # The new coord modulo the max coord. This means the snake will wrap back to the beginning.
+
         new_X = (self.X + self.dX) % blocks_x
         new_Y = (self.Y + self.dY) % blocks_y
 
