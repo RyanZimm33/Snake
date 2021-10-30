@@ -56,7 +56,7 @@ def game_intro(screen):
         under = myfont2.render("Press Space to Begin", 1, (255, 0, 0))
         screen.blit(title,(30, 30))
         screen.blit(under,(30, 80))
-        pygame.display.flip() 
+        pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
