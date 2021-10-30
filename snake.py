@@ -657,6 +657,8 @@ class EasyNPC(NPCController):
         dX = map.fruits[0].x - self.snake.X
         dY = map.fruits[0].y - self.snake.Y
 
+        if (dX + dY) == 0:
+            return None
         probRight = (dX / (dX + dY))
         probUp = (dY / (dY + dX))
 
