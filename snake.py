@@ -31,7 +31,7 @@ def game_loop(screen, clock, settings):
                 clock.tick(blocks_x / speed)
 
                 for cont in controllers:
-                    cont.post_events()
+                    cont.post_events(map)
 
                 if not handle_events(players):
                     return None
@@ -64,7 +64,7 @@ def game_setup(settings):
     blocks_x = int(screen_width / cell_size)
     blocks_y = int(screen_height / cell_size)
 
-    map = [[0 for x in range(blocks_x)] for y in range(blocks_y)]
+    map = Map(blocks_x, blocks_y)
     p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
@@ -80,9 +80,9 @@ def game_setup(settings):
     elif (Game_Mode == 2):
         player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
 
-        npc1cont = NPCController(len(controllers))    # add easy, medium, hard
+        npc1cont = EasyNPC(len(controllers))    # add easy, medium, hard
         controllers.append(npc1cont)
-        playerNPC = Snake(8, 8, map, controls=npc1cont.get_virtual_events())
+        playerNPC = npc1cont.bind_snake(8, 8, map)
 
         players = [player, playerNPC]
 
@@ -343,6 +343,8 @@ class Fruit:
         self.map = map
         self.screen = screen
 
+        self.map.fruits.append(self)
+
         while True:
             self.x = random.randint(0, blocks_x - 1)
             self.y = random.randint(0, blocks_y - 1)
@@ -366,6 +368,7 @@ class Fruit:
 
     def eat(self):
         """This fruit has been destroyed. Create a new Fruit."""
+        self.map.fruits.remove(self)
         Fruit(self.screen, self.map)
 
 class BigFruit(Fruit):
@@ -617,6 +620,14 @@ class NPCController:
         """Create vitrual event types for up, down, left, right."""
         self.n = n
 
+    def bind_snake(self, *args, **kwargs):
+        """Bind a snake to this controller."""
+        controls = self.get_virtual_events()
+        kwargs['controls'] = controls
+        self.snake = Snake(*args, **kwargs)
+
+        return self.snake
+
     def get_virtual_events(self):
         """Returns a tuple of the virtual events in the order of up, down, left right. This is meant to be passed along to the controls parameter of a snake."""
         controls = []
@@ -648,6 +659,41 @@ class NPCController:
             return 'left'
         elif n < turn_chance:
             return 'right'
+
+class EasyNPC(NPCController):
+    def move_algorithm(self, map, *args, **kwargs):
+        dX = map.fruits[0].x - self.snake.X
+        dY = map.fruits[0].y - self.snake.Y
+
+        probRight = (dX / (dX + dY))
+        probUp = (dY / (dY + dX))
+
+        if (abs(probRight * random.random()) > abs(probUp * random.random())):
+            if probRight > 0:
+                return 'right'
+            else:
+                return 'left'
+        else:
+            if probUp > 0:
+                return 'up'
+            else:
+                return 'down'
+
+class Map(list):
+    """The map containing all fruits and snakes."""
+
+    def __init__(self, x, y):
+        """Create matrix."""
+        list.__init__(self)
+
+        for iy in range(y):
+            row = []
+            for ix in range(x):
+                row.append(0)
+            self.append(row)
+
+        self.fruits = []
+
 
 
 def NPC_algo(fruit, snake):
