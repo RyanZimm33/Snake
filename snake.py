@@ -196,42 +196,42 @@ def optionScreen(screen):
         screen.fill((0,0,0))
         #Draws buttons, color changes if mouse is hovering over
         mouse = pygame.mouse.get_pos()
-        if 30 <= mouse[0] <= 100 and 90 <= mouse[1] <= 130:
+        if (30 <= mouse[0] <= 100 and 90 <= mouse[1] <= 130) or settings["Difficulty"] == 0:
             pygame.draw.rect(screen,(255,0,0),(30, 90 , 70, 40))
             diff1 = small.render("Easy", 1, (255, 255, 255))
         else:
             pygame.draw.rect(screen,(255,255,255),(30, 90 , 70, 40))
             diff1 = small.render("Easy", 1, (255, 0, 0))
 
-        if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
+        if (120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130) or settings["Difficulty"] == 1:
             pygame.draw.rect(screen,(255,0,0),(120, 90 , 100, 40))
             diff2 = small.render("Medium", 1, (255, 255, 255))
         else:
             pygame.draw.rect(screen,(255,255,255),(120, 90 , 100, 40))
             diff2 = small.render("Medium", 1, (255, 0, 0))
 
-        if 240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130:
+        if (240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130) or settings["Difficulty"] == 2:
             pygame.draw.rect(screen,(255,0,0),(240, 90 , 60, 40))
             diff3 = small.render("Hard", 1, (255, 255, 255))
         else:
             pygame.draw.rect(screen,(255,255,255),(240, 90 , 60, 40))
             diff3 = small.render("Hard", 1, (255, 0, 0))
 
-        if 30 <= mouse[0] <= 100 and 150 <= mouse[1] <= 190:
+        if (30 <= mouse[0] <= 100 and 150 <= mouse[1] <= 190) or settings["Gamemode"] == 0:
             pygame.draw.rect(screen,(255,0,0),(30, 150 , 70, 40))
             game1 = small.render("Snake", 1, (255, 255, 255))
         else:
             pygame.draw.rect(screen,(255,255,255),(30, 150 , 70, 40))
             game1 = small.render("Snake", 1, (255, 0, 0))
 
-        if 120 <= mouse[0] <= 220 and 150 <= mouse[1] <= 190:
+        if (120 <= mouse[0] <= 220 and 150 <= mouse[1] <= 190) or settings["Gamemode"] == 1:
             pygame.draw.rect(screen,(255,0,0),(120, 150 , 100, 40))
             game2 = small.render("Multi", 1, (255, 255, 255))
         else:
             pygame.draw.rect(screen,(255,255,255),(120, 150 , 100, 40))
             game2 = small.render("Multi", 1, (255, 0, 0))
 
-        if 240 <= mouse[0] <= 300 and 150 <= mouse[1] <= 190:
+        if (240 <= mouse[0] <= 300 and 150 <= mouse[1] <= 190) or settings["Gamemode"] == 2:
             pygame.draw.rect(screen,(255,0,0),(240, 150 , 60, 40))
             game3 = small.render("CPU", 1, (255, 255, 255))
         else:
