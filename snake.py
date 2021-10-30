@@ -1,8 +1,7 @@
 import pygame
 
-
-screen_size = (800, 600)
-
+screen_width = 800
+screen_height = 600
 
 # While loop section
 def main():
@@ -10,28 +9,27 @@ def main():
     global pygame
     global screen_size
 
-    screen = pygame.display.set_mode(screen_size)
+    screen = pygame.display.set_mode((screen_width, screen_height))
 
-    p1 = Snake((400, 300), pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d)
+    p1 = Snake(100,100)
 
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                p1.ch_dir[event.key]()
+        #handle_events(pygame.event.get())
+
 
         p1.move()
 
         pygame.display.update()
 
 
+
+
 # Snake class section
 class Snake:
     """A snake with its own length and position."""
 
-    def __init__(self, xy, up, down, left, right, color=(0, 0, 255)):
+    def __init__(self, X, Y, color=(0, 0, 255)):
         """Create snake.
 
         Parameters
@@ -44,51 +42,68 @@ class Snake:
             The rgb color of the snake.
         """
         self.ch_dir = {
-            up: self.up,
-            down: self.down,
-            left: self.left,
-            right: self.right
+            "k_UP": self.up,
+            "k_DOWN": self.down,
+            "k_LEFT": self.left,
+            "k_RIGHT": self.right
         }
 
-        self.xy = xy
-        self.velocity = (1, 0)
+        self.X = X
+        self.Y = Y
+        self.dX = 1
+        self.dY = 0
+        self.tail = (0,0)
         self.color = color
 
-        self.body = [xy]
+        self.body = [(X, Y)]
 
 
     def move(self):
         """Move one position."""
         global screen_size
 
-        new_x = (self.xy[0] + self.velocity[0]) % screen_size[0]
-        new_y = (self.xy[1] + self.velocity[1]) % screen_size[1]
+        self.X = (self.X + self.dX * 50) % screen_width
+        self.Y = (self.Y + self.dY * 50) % screen_height
 
-        self.xy = (new_x, new_y)
-        self.body.append(self.xy)
-        old_xy = self.body.pop(0)
+        # new_x = (self.xy[0] + self.velocity[0]) % screen_size[0]
+        # new_y = (self.xy[1] + self.velocity[1]) % screen_size[1]
+
+        self.body.append(self.X, self.Y)
+        self.tail = self.body.pop(0)
 
         # Draw new rectangle at self.xy
         # Delete old rectangle at old_xy
 
         print(self.body)
 
+    def draw(self):
+        head = self.body[len(self.body)]
+        tail = self.body[0]
+
+        black = (0,0,0)
+        white = (255,255,255)
+
+        # erase tail
+        pygame.draw.rect(screen, black, (tail[0], tail[1], 50, 50))
+        # draw new head
+        pygame.draw.rect(screen, white, (head[0], head[1], 50, 50))
+
 
     def up(self):
         """Move up."""
-        self.velocity = (0, 1)
+        self.dX, self.dY = 0, -1
 
     def down(self):
         """Move down."""
-        self.velocity = (0, -1)
+        self.dX, self.dY = 0, 1
 
     def left(self):
         """Move left."""
-        self.velocity = (-1, 0)
+        self.dX, self.dY = -1, 0
 
     def right(self):
         """Move right."""
-        self.velocity = (1, 0)
+        self.dX, self.dY = 1, 0
 
 
 # Random generation section
