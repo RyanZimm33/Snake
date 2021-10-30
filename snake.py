@@ -18,7 +18,7 @@ def main():
 
     settings = game_intro(screen)
     stats = game_loop(screen, clock, settings)
-    # end_screen(screen, stats)
+    end_screen(screen, stats)
 
 
 def game_loop(screen, clock, settings):
@@ -48,7 +48,7 @@ def game_loop(screen, clock, settings):
 
 def game_setup(settings):
 
-    Game_Mode = 2
+    Game_Mode = 0
     cell_size = 40
     blocks_x = int(screen_width / cell_size)
     blocks_y = int(screen_height / cell_size)
@@ -122,43 +122,44 @@ def game_intro(screen):
                     screen.fill((0, 0, 0))
 
 def end_screen(screen, stats):
-    snake1, snake2 = stats[0], stats[1]
-    """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
-    myfont = pygame.font.SysFont("Britannic Bold", 40)
-    myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+    if (len(stats) > 1):
+        snake1, snake2 = stats[0], stats[1]
+        """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
+        myfont = pygame.font.SysFont("Britannic Bold", 40)
+        myfont2 = pygame.font.SysFont("Britannic Bold", 30)
 
-    if snake1.loser and not snake2.loser:
-        winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
-    elif snake2.loser and not snake1.loser:
-        winner = myfont.render("Player 1 Wins!", 1, (255, 0,0))
-    else:
-        winner = myfont.render("Tie", 1, (255, 0,0))
+        if snake1.loser and not snake2.loser:
+            winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
+        elif snake2.loser and not snake1.loser:
+            winner = myfont.render("Player 1 Wins!", 1, (255, 0,0))
+        else:
+            winner = myfont.render("Tie", 1, (255, 0,0))
 
-    scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
-    underline  = myfont.render("__________", 1, (255,0,0))
+        scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
+        underline  = myfont.render("__________", 1, (255,0,0))
 
-    score1 = myfont2.render("Player 1: " + str(len(snake1.body)), 1, (255,0,0))
-    score2 = myfont2.render("Player 2: " + str(len(snake2.body)), 1, (255,0,0))
+        score1 = myfont2.render("Player 1: " + str(len(snake1.body)), 1, (255,0,0))
+        score2 = myfont2.render("Player 2: " + str(len(snake2.body)), 1, (255,0,0))
 
-    screen.blit(winner, (30, 30))
-    screen.blit(scoreboard, (30, 60))
-    screen.blit(underline, (30,80))
-    screen.blit(score1, (30, 110))
-    screen.blit(score2, (30, 140))
-    pygame.display.flip()
+        screen.blit(winner, (30, 30))
+        screen.blit(scoreboard, (30, 60))
+        screen.blit(underline, (30,80))
+        screen.blit(score1, (30, 110))
+        screen.blit(score2, (30, 140))
+        pygame.display.flip()
 
-    end = True
-    while end:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                end = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+        end = True
+        while end:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     end = False
-                elif event.key == pygame.K_ESCAPE:
-                    end = False
-                elif event.key == pygame.K_r:
-                    return True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        end = False
+                    elif event.key == pygame.K_ESCAPE:
+                        end = False
+                    elif event.key == pygame.K_r:
+                        return True
 
 def show_score(score_coords, score, screen):
     x, y = score_coords
