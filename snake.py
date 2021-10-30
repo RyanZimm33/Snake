@@ -38,8 +38,10 @@ def main():
 
             show_score(10, 10, p1.score, screen)
             show_score(770, 10, p2.score, screen)
+
             pygame.display.update()
     except Exception as e:
+        # When there is a snake collision, Exception('Game Over') is thrown.
         if(str(e) == "Game Over"):
             end_screen(screen, p1, p2)
 
@@ -65,6 +67,7 @@ def handle_events(players):
 
     return True
 
+
 def game_intro(screen):
     """Starting screen. Displays the game's name, controls, and anything else needed."""
     myfont = pygame.font.SysFont("Britannic Bold", 40)
@@ -86,10 +89,10 @@ def game_intro(screen):
                     screen.fill((0, 0, 0))
 
 def end_screen(screen, snake1, snake2):
+    """Screen displayed upon Game Over. Displays winner, loser and the points scored."""
     myfont = pygame.font.SysFont("Britannic Bold", 40)
     myfont2 = pygame.font.SysFont("Britannic Bold", 30)
 
-    winner = myfont.render("", 1, (255, 0,0))
     if snake1.loser and not snake2.loser:
         winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
     elif snake2.loser and not snake1.loser:
@@ -111,14 +114,19 @@ def end_screen(screen, snake1, snake2):
     pygame.display.flip()
 
     end = True
-    while(end):
+    while end:
         for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        end = False
+            if event.type == pygame.KEYDOWN:
+                if event.type == pygame.QUIT:
+                    end = False
+                elif event.key == pygame.K_SPACE:
+                    end = False
+                elif event.key == pygame.K_ESCAPE:
+                    end = False
 
 
 def show_score(x, y, score, screen):
+    """Display score to the corners of the screen."""
     blocker = pygame.Rect(x, y, 60, 60)
     pygame.draw.rect(screen, (0, 0, 0), blocker)
     font = pygame.font.SysFont("Britannic Bold", 60)
@@ -140,12 +148,12 @@ class Fruit:
 
         # Render the fruit
         x, y = index_to_pixels(self.x, self.y)
-        '''
-        fruit = pygame.Rect(x, y, cell_size, cell_size)
-        pygame.draw.rect(screen, (255, 0, 0), fruit)
-        '''
+
+        # fruit = pygame.Rect(x, y, cell_size, cell_size)
+        # pygame.draw.rect(screen, (255, 0, 0), fruit)
+
         white = (255,255,255)
-        n = cell_size/3
+        n = cell_size / 3
         pygame.draw.rect(screen, white, (x + n, y, n, n))
         pygame.draw.rect(screen, white, (x, y + n, n, n))
         pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
@@ -198,10 +206,12 @@ class Snake:
         self.score = 0
 
     def get_color(self):
-        r = self.color[0] or 50 + 200 * ((self.X * cell_size) / screen_width)
-        g = self.color[1] or 50 + 200 * ((self.Y * cell_size) / screen_height)
-        b = self.color[2] or 50 + 200 * ((self.X * cell_size) / screen_width)
-        return (int(r),int(g),int(b))
+        """Generate a color for the head by factoring in the x and y position."""
+        x, y = index_to_pixels(self.X, self.Y)
+        r = self.color[0] or 50 + 200 * (x / screen_width)
+        g = self.color[1] or 50 + 200 * (y / screen_height)
+        b = self.color[2] or 50 + 200 * (x / screen_width)
+        return (int(r), int(g), int(b))
 
 
     def move(self, screen):
@@ -246,7 +256,7 @@ class Snake:
 
         # Draw new head
         head_coord = index_to_pixels(head[0], head[1])
-        color = (100, 255 * (head_coord[0] / screen_width), 255 * (head_coord[1] / screen_height))
+        # color = (100, 255 * (head_coord[0] / screen_width), 255 * (head_coord[1] / screen_height))
         color = self.get_color()
         pygame.draw.rect(screen, color, (head_coord[0], head_coord[1], cell_size-1, cell_size-1))
 
