@@ -208,6 +208,7 @@ class Snake:
 
         self.color = color
         self.growing = False
+        self.already_turned = False
         self.loser = False
         self.score = 1
 
@@ -233,6 +234,8 @@ class Snake:
         self.Y = new_Y
         self.body.append((self.X, self.Y))
         self.map[self.Y][self.X] = 1
+
+        self.already_turned = False
 
         if self.growing:
             # Do NOT remove the tail
@@ -275,23 +278,31 @@ class Snake:
 
     def up(self):
         """Change direction to up."""
-        if not (self.dY == 1):
-            self.dX, self.dY = 0, -1
+        if not self.already_turned:
+            if not (self.dY == 1):
+                self.dX, self.dY = 0, -1
+                self.already_turned = True
 
     def down(self):
         """Change direction to down."""
-        if not (self.dY == -1):
-            self.dX, self.dY = 0, 1
+        if not self.already_turned:
+            if not (self.dY == -1):
+                self.dX, self.dY = 0, 1
+                self.already_turned = True
 
     def left(self):
         """Change direction to left."""
-        if not (self.dX == 1):
-            self.dX, self.dY = -1, 0
+        if not self.already_turned:
+            if not (self.dX == 1):
+                self.dX, self.dY = -1, 0
+                self.already_turned = True
 
     def right(self):
         """Change direction to right."""
-        if not (self.dX == -1):
-            self.dX, self.dY = 1, 0
+        if not self.already_turned:
+            if not (self.dX == -1):
+                self.dX, self.dY = 1, 0
+                self.already_turned = True
 
 class SnakeNPC(Snake):
     """An snake with no controls and changes direction randomly."""
