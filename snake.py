@@ -1,11 +1,18 @@
-import pygame
+import pygame, random
 
 
 screen_width = 800
 screen_height = 600
+
+cell_height_count = 12
+cell_width_count = 16
+cell_size = 50
+clock = pygame.time.Clock()
+
 cell_size = 50
 blocks_x = screen_width // cell_size
 blocks_y = screen_height // cell_size
+
 
 
 def main():
@@ -22,6 +29,7 @@ def main():
     p1 = Snake(7, 5, map, controls=p1controls, color=(0, 0, 255))
     p2 = Snake(1, 1, map, controls=p2controls, color=(0, 255, 0))
     players = [p1, p2]
+    fruit = Fruit()
 
     game_intro(screen)
 
@@ -32,19 +40,28 @@ def main():
             p.move()
             p.draw(screen)
 
+        fruit.drawFruit(screen)
+        if(fruit.collision(p1.getX(), p1.getY())):
+            p1.grow()
+        if(fruit.collision(p2.getX(), p2.getY())):
+            p2.grow()
         pygame.display.update()
 
 def game_intro(screen):
     intro =True
     while (intro):
         myfont = pygame.font.SysFont("Britannic Bold", 40)
-        nlabel = myfont.render("Welcome ", 1, (255, 0, 0))
+        myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+        title = myfont.render("Snake, but actually Tron", 1, (255, 0, 0))
+        under = myfont2.render("Press Space to Begin", 1, (255, 0, 0))
+        screen.blit(title,(30, 30))
+        screen.blit(under,(30, 80))
+        pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     intro = False
-        screen.blit(nlabel,(200,200))
-        pygame.display.flip()
+                    screen.fill((0,0,0))
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -67,6 +84,24 @@ def handle_events(players):
                     pass
 
     return True
+
+class Fruit:
+    def __init__(self):
+        self.x = random.randint(0, cell_width_count - 1)
+        self.y = random.randint(0, cell_height_count - 1)
+
+    def drawFruit(self, screen):
+        fruit = pygame.Rect(self.x * cell_size, self.y * cell_size, 50, 50)
+        pygame.draw.rect(screen ,(255, 0, 0), fruit)
+
+    def collision(self, xPos, yPos):
+        if self.x * cell_size == int(xPos) and self.y * cell_size == int(yPos):
+            self.x = random.randint(0, cell_width_count - 1)
+            self.y = random.randint(0, cell_height_count - 1)
+            return True
+        else:
+            return False
+
 
 
 class Snake:
@@ -178,6 +213,12 @@ class Snake:
         """Change direction to right."""
         if not (self.dX == -1):
             self.dX, self.dY = 1, 0
+
+    def getX(self):
+        return self.X
+
+    def getY(self):
+        return self.Y
 
 
 def index_to_pixels(x, y):
