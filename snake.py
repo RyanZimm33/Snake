@@ -25,6 +25,18 @@ def main():
             p.draw(screen)
 
         pygame.display.update()
+        
+def game_intro(screen):
+    intro =True
+    while (intro):
+        myfont = pygame.font.SysFont("Britannic Bold", 40)
+        nlabel = myfont.render("Welcome ", 1, (255, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    intro = False
+        screen.blit(nlabel,(200,200))
+        pygame.display.flip()       
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
