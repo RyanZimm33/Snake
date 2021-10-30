@@ -35,6 +35,8 @@ def main():
             p.move(screen)
             p.draw(screen)
 
+        show_score(10, 10, p1.score, screen)
+        show_score(770, 10, p2.score, screen)
         pygame.display.update()
 
 def handle_events(players):
@@ -79,6 +81,13 @@ def game_intro(screen):
                     intro = False
                     screen.fill((0, 0, 0))
 
+
+def show_score(x, y, score, screen):
+    blocker = pygame.Rect(x, y, 60, 60)
+    pygame.draw.rect(screen, (0, 0, 0), blocker)
+    font = pygame.font.SysFont("Britannic Bold", 60)
+    score_view = font.render(str(score), True, (255, 255, 255))
+    screen.blit(score_view, (x, y))
 
 class Fruit:
     """Object to be eaten by snakes. Allows snakes to grow."""
@@ -141,6 +150,8 @@ class Snake:
         self.color = color
         self.growing = False
 
+        self.score = 0
+
 
     def move(self, screen):
         """Move forward one cell. Check the map for collisions with snakes or fruits."""
@@ -156,6 +167,7 @@ class Snake:
             # Apple Collision
             Fruit(screen, self.map)
             self.growing = True
+            self.score += 1
 
         self.X = new_X
         self.Y = new_Y
