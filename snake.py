@@ -1,12 +1,16 @@
 import pygame
 
 
+screen_size = (800, 600)
+
+
 # While loop section
 def main():
     """Start game."""
     global pygame
+    global screen_size
 
-    screen = pygame.display.set_mode((800, 600))
+    screen = pygame.display.set_mode(screen_size)
 
     p1 = Snake((400, 300), pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d)
 
@@ -16,7 +20,9 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                p1.move[event.key]()
+                p1.ch_dir[event.key]()
+
+        p1.move()
 
         pygame.display.update()
 
@@ -37,7 +43,7 @@ class Snake:
         color : (int, int, int)
             The rgb color of the snake.
         """
-        self.move = {
+        self.ch_dir = {
             up: self.up,
             down: self.down,
             left: self.left,
@@ -45,43 +51,41 @@ class Snake:
         }
 
         self.xy = xy
+        self.velocity = (1, 0)
         self.color = color
 
         self.body = [xy]
 
 
+    def move(self):
+        """Move one position."""
+        global screen_size
+
+        new_x = (self.xy[0] + self.velocity[0]) % screen_size[0]
+        new_y = (self.xy[1] + self.velocity[1]) % screen_size[1]
+
+        self.xy = (new_x, new_y)
+        self.body.append(self.xy)
+        old_xy = self.body.pop(0)
+
+        print(self.body)
+
+
     def up(self):
         """Move up."""
-        new_xy = (self.xy[0], self.xy[1] + 1)
-        self.xy = new_xy
-        self.body.append(new_xy)
-        self.body.pop(0)
-        print(self.body)
+        self.velocity = (0, 1)
 
     def down(self):
         """Move down."""
-        new_xy = (self.xy[0], self.xy[1] - 1)
-        self.xy = new_xy
-        self.body.append(new_xy)
-        self.body.pop(0)
-        print(self.body)
+        self.velocity = (0, -1)
 
     def left(self):
         """Move left."""
-        new_xy = (self.xy[0] - 1, self.xy[1])
-        self.xy = new_xy
-        self.body.append(new_xy)
-        self.body.pop(0)
-        print(self.body)
+        self.velocity = (-1, 0)
 
     def right(self):
         """Move right."""
-        new_xy = (self.xy[0] + 1, self.xy[1])
-        self.xy = new_xy
-        self.body.append(new_xy)
-        self.body.pop(0)
-        print(self.body)
-
+        self.velocity = (1, 0)
 
 
 # Random generation section
