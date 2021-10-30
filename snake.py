@@ -51,7 +51,8 @@ def game_loop(screen, clock, settings):
 
 def game_setup(settings):
 
-    Game_Mode = 1
+    Game_Mode = settings['Gamemode']
+    difficulty = settings['Difficulty']
     cell_size = 40
     blocks_x = int(screen_width / cell_size)
     blocks_y = int(screen_height / cell_size)
@@ -116,7 +117,7 @@ def game_intro(screen):
         else:
             pygame.draw.rect(screen,(255,255,255),(30, 90 , 70, 40))
             startT = small.render("Start", 1, (255, 0, 0))
-            
+
         if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
             pygame.draw.rect(screen,(255,0,0),(120, 90 , 100, 40))
             settingsT = small.render("Options", 1, (255, 255, 255))
@@ -135,13 +136,13 @@ def game_intro(screen):
         screen.blit(startT, (40, 100))
         screen.blit(settingsT, (130, 100))
         screen.blit(exitT, (250, 100))
-            
+
         #Button events
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #Start
                 if 30 <= mouse[0] <= 90 and 90 <= mouse[1] <= 130:
-                    intro = False 
+                    intro = False
                     screen.fill((0, 0, 0))
                     return settings
                 #Options
@@ -164,7 +165,7 @@ def optionScreen(screen):
     optionT = big.render("Options", 1, (255, 0, 0))
     diffSelction = small.render("Difficulty: Easy" , 1, (255,0,0))
     gameSelction = small.render("Gamemode: Snake" , 1, (255,0,0))
-    
+
 
     while True:
         screen.fill((0,0,0))
@@ -176,7 +177,7 @@ def optionScreen(screen):
         else:
             pygame.draw.rect(screen,(255,255,255),(30, 90 , 70, 40))
             diff1 = small.render("Easy", 1, (255, 0, 0))
-            
+
         if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
             pygame.draw.rect(screen,(255,0,0),(120, 90 , 100, 40))
             diff2 = small.render("Medium", 1, (255, 255, 255))
@@ -197,7 +198,7 @@ def optionScreen(screen):
         else:
             pygame.draw.rect(screen,(255,255,255),(30, 150 , 70, 40))
             game1 = small.render("Snake", 1, (255, 0, 0))
-            
+
         if 120 <= mouse[0] <= 220 and 150 <= mouse[1] <= 190:
             pygame.draw.rect(screen,(255,0,0),(120, 150 , 100, 40))
             game2 = small.render("Multi", 1, (255, 255, 255))
@@ -218,8 +219,8 @@ def optionScreen(screen):
         else:
             pygame.draw.rect(screen,(255,255,255),(30, 250 , 70, 40))
             exitT = small.render("Exit", 1, (255,0,0))
-        
-        
+
+
         screen.blit(optionT, (30, 30))
         screen.blit(diff1, (40, 100))
         screen.blit(diff2, (130, 100))
