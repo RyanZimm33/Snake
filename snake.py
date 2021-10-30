@@ -11,7 +11,10 @@ def main():
 
     screen = pygame.display.set_mode((screen_width, screen_height))
 
+
+
     p1 = Snake(400, 300)
+
     players = [p1]
 
     while handle_events(players):
@@ -19,7 +22,6 @@ def main():
         p1.move()
         p1.draw(screen)
 
-        pygame.display.update()
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -61,7 +63,9 @@ class Snake:
             pygame.K_UP: self.up,
             pygame.K_DOWN: self.down,
             pygame.K_LEFT: self.left,
-            pygame.K_RIGHT: self.right
+            pygame.K_RIGHT: self.right,
+            # for testing
+            pygame.K_g: self.grow
         }
 
         self.X = X
@@ -70,9 +74,12 @@ class Snake:
         self.dY = 0
         self.tail = (0,0)
         self.color = color
+        self.growing = False
 
         self.body = [(X, Y)]
 
+    def grow(self):
+        self.growing = True
 
     def move(self):
         """Move one position."""
@@ -85,12 +92,15 @@ class Snake:
         # new_y = (self.xy[1] + self.velocity[1]) % screen_size[1]
 
         self.body.append((self.X, self.Y))
-        self.tail = self.body.pop(0)
+
+        if not (self.growing):
+            self.tail = self.body.pop(0)
+        else:
+            self.growing = False
 
         # Draw new rectangle at self.xy
         # Delete old rectangle at old_xy
 
-        print(self.body)
 
     def draw(self, screen):
         head = self.body[-1]
@@ -102,7 +112,10 @@ class Snake:
         # erase tail
         pygame.draw.rect(screen, black, (tail[0], tail[1], 50, 50))
         # draw new head
-        pygame.draw.rect(screen, white, (head[0], head[1], 50, 50))
+        pygame.draw.rect(screen, white, (head[0], head[1], 49, 49))
+        # render
+        pygame.display.update()
+
 
 
     def up(self):
