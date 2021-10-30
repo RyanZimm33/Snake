@@ -318,6 +318,9 @@ if __name__ == '__main__':
         raise Exception('screen_width and screen_height must be divisible by cell_size')
 
     pygame.init()
+    pygame.display.set_caption("Tron Snake")
+    icon = pygame.image.load("snake-2.png")
+    pygame.display.set_icon(icon)
 
     # Loop allows restarting
     while main():
