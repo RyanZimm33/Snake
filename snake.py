@@ -28,16 +28,20 @@ def main():
     players = [p1, p2]
 
     Fruit(screen, map)
+    
+    try:
+        while handle_events(players):
+            clock.tick(5)
+            for p in players:
+                p.move(screen)
+                p.draw(screen)
 
-    while handle_events(players):
-        clock.tick(5)
-        for p in players:
-            p.move(screen)
-            p.draw(screen)
-
-        show_score(10, 10, p1.score, screen)
-        show_score(770, 10, p2.score, screen)
-        pygame.display.update()
+            show_score(10, 10, p1.score, screen)
+            show_score(770, 10, p2.score, screen)
+            pygame.display.update()
+    except Exception as e:
+        if(str(e) == "Game Over"):
+            end_screen(screen, p1, p2)
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -80,6 +84,38 @@ def game_intro(screen):
                 if event.key == pygame.K_SPACE:
                     intro = False
                     screen.fill((0, 0, 0))
+                    
+def end_screen(screen, snake1, snake2):
+    myfont = pygame.font.SysFont("Britannic Bold", 40)
+    myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+
+    winner = myfont.render("", 1, (255, 0,0))
+    if snake1.loser and not snake2.loser:
+        winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
+    elif snake2.loser and not snake1.loser:
+        winner = myfont.render("Player 1 Wins!", 1, (255, 0,0))
+    else:
+        winner = myfont.render("Tie", 1, (255, 0,0))
+        
+    scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
+    underline  = myfont.render("__________", 1, (255,0,0))
+
+    score1 = myfont2.render("Player 1: " + str(len(snake1.body)), 1, (255,0,0))
+    score2 = myfont2.render("Player 2: " + str(len(snake2.body)), 1, (255,0,0))
+
+    screen.blit(winner, (30, 30))
+    screen.blit(scoreboard, (30, 60))
+    screen.blit(underline, (30,80))
+    screen.blit(score1, (30, 110))
+    screen.blit(score2, (30, 140))
+    pygame.display.flip()
+    
+    end = True
+    while(end):
+        for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        end = False
 
 
 def show_score(x, y, score, screen):
@@ -149,6 +185,7 @@ class Snake:
 
         self.color = color
         self.growing = False
+        self.loser = False
 
         self.score = 0
 
@@ -161,8 +198,8 @@ class Snake:
 
         obstacle = self.map[new_Y][new_X]
         if obstacle == 1:
-            # Snake Collision
-            return None
+            self.loser = True
+            raise Exception("Game Over")
         elif obstacle == 2:
             # Apple Collision
             Fruit(screen, self.map)
