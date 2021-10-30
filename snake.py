@@ -42,8 +42,9 @@ def main():
             pygame.display.update()
     except Exception as e:
         # When there is a snake collision, Exception('Game Over') is thrown.
-        if(str(e) == "Game Over"):
-            end_screen(screen, p1, p2)
+        if str(e) == "Game Over":
+            # end_screen will return True if user restarts.
+            return end_screen(screen, p1, p2)
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -89,7 +90,7 @@ def game_intro(screen):
                     screen.fill((0, 0, 0))
 
 def end_screen(screen, snake1, snake2):
-    """Screen displayed upon Game Over. Displays winner, loser and the points scored."""
+    """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
     myfont = pygame.font.SysFont("Britannic Bold", 40)
     myfont2 = pygame.font.SysFont("Britannic Bold", 30)
 
@@ -123,7 +124,8 @@ def end_screen(screen, snake1, snake2):
                     end = False
                 elif event.key == pygame.K_ESCAPE:
                     end = False
-
+                elif event.key == pygame.K_r:
+                    return True
 
 def show_score(x, y, score, screen):
     """Display score to the corners of the screen."""
@@ -132,6 +134,7 @@ def show_score(x, y, score, screen):
     font = pygame.font.SysFont("Britannic Bold", 60)
     score_view = font.render(str(score), True, (255, 255, 255))
     screen.blit(score_view, (x, y))
+
 
 class Fruit:
     """Object to be eaten by snakes. Allows snakes to grow."""
@@ -158,7 +161,6 @@ class Fruit:
         pygame.draw.rect(screen, white, (x, y + n, n, n))
         pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
         pygame.draw.rect(screen, white, (x + n, y + 2*n, n, n))
-
 
 class Snake:
     """A snake. Moves forward every cycle and contains event handlers for turning."""
@@ -315,4 +317,6 @@ if __name__ == '__main__':
 
     pygame.init()
 
-    main()
+    # Loop allows restarting
+    while main():
+        pass
