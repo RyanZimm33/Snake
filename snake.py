@@ -38,11 +38,14 @@ def game_loop(screen, clock, settings):
                 #show_score(770, 10, p2.score, screen)
 
                 pygame.display.update()
+
         except Exception as e:
-            # When there is a snake collision, Exception('Game Over') is thrown.
+                # When there is a snake collision, Exception('Game Over') is thrown.
             if str(e) == "Game Over":
-                # end_screen will return True if user restarts.
+                    # end_screen will return True if user restarts.
                 return players
+            else:
+                raise e
 
         # need players, fruit
 
@@ -72,15 +75,6 @@ def game_setup(settings):
 
     return (players, map)
 
-
-            pygame.display.update()
-    except Exception as e:
-        # When there is a snake collision, Exception('Game Over') is thrown.
-        if str(e) == "Game Over":
-            # end_screen will return True if user restarts.
-            return end_screen(screen, p1, p2)
-        else:
-            raise e
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
