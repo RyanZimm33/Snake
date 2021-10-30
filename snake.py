@@ -1,7 +1,6 @@
 import random
 import pygame
 
-
 screen_width = 800
 screen_height = 600
 cell_size = 50
@@ -26,7 +25,7 @@ def main():
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
     p1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
-    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 1, 0))
+    p2 = Snake(1, 1, map, controls=p2controls, color=(0, 0, 1))
     pNPC = SnakeNPC(8, 8, map)
     players = [p1, p2, pNPC]
 
@@ -215,9 +214,9 @@ class Snake:
     def get_color(self):
         """Generate a color for the head by factoring in the x and y position."""
         x, y = index_to_pixels(self.X, self.Y)
-        r = self.color[0] or 50 + 200 * (x / screen_width)
-        g = self.color[1] or 50 + 200 * (y / screen_height)
-        b = self.color[2] or 50 + 200 * (x / screen_width)
+        r = self.color[0] or 150 + 100 * (x / screen_width)
+        g = self.color[1] or 100 + 150 * (y / screen_height)
+        b = self.color[2] or 150 + 100 * (x / screen_width)
         return (int(r), int(g), int(b))
 
 
@@ -339,6 +338,9 @@ if __name__ == '__main__':
         raise Exception('screen_width and screen_height must be divisible by cell_size')
 
     pygame.init()
+    pygame.display.set_caption("Tron Snake")
+    icon = pygame.image.load("snake-2.png")
+    pygame.display.set_icon(icon)
 
     # Loop allows restarting
     while main():
