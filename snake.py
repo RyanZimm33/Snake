@@ -302,7 +302,6 @@ class SnakeNPC(Snake):
         turn_chance = 0.10
 
         n = random.random()
-        print(n)
 
         # Of the 4 turns, only 2 will have an effect.
         if n < (turn_chance * (1/4)):
