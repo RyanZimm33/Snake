@@ -22,13 +22,20 @@ def main():
 
 
 def game_loop(screen, clock, settings):
-        players, map = game_setup(settings)
+        players, map, controllers = game_setup(settings)
 
         Fruit(screen, map)
 
         try:
-            while handle_events(players):
+            while True:
                 clock.tick(blocks_x / speed)
+
+                for cont in controllers:
+                    cont.post_events()
+
+                if not handle_events(players):
+                    return None
+
                 for player in players:
                     player.move(screen)
                     show_score(player.score_coords, player.score, screen)
@@ -51,7 +58,7 @@ def game_loop(screen, clock, settings):
 
 def game_setup(settings):
 
-    Game_Mode = 1
+    Game_Mode = 2
     cell_size = 40
     blocks_x = int(screen_width / cell_size)
     blocks_y = int(screen_height / cell_size)
@@ -60,6 +67,7 @@ def game_setup(settings):
     p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
+    controllers = []
 
     if (Game_Mode == 0):
         player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
@@ -70,10 +78,14 @@ def game_setup(settings):
         players = [player1, player2]
     elif (Game_Mode == 2):
         player = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0), score_coords=(10,10))
-        playerNPC = SnakeNPC(8,8, map)  # add easy, medium, hard
+
+        npc1cont = NPCController(len(controllers))    # add easy, medium, hard
+        controllers.append(npc1cont)
+        playerNPC = Snake(8, 8, map, controls=npc1cont.get_virtual_events())
+
         players = [player, playerNPC]
 
-    return (players, map)
+    return (players, map, controllers)
 
 
 def handle_events(players):
@@ -93,6 +105,12 @@ def handle_events(players):
             for p in players:
                 try:
                     p.ch_dir[event.key]()
+                except KeyError:
+                    pass
+        elif event.type == NPCController.VIRT_EVENT:
+            for p in players:
+                try:
+                    p.ch_dir[(event.n, event.dir)]()
                 except KeyError:
                     pass
 
@@ -441,6 +459,47 @@ class SnakeNPC(Snake):
             Fruit(screen, self.map)
             self.growing = True
             self.score += 1
+
+class NPCController:
+    """Generates virtual events for npc snakes and defines the algorithm for when those events will be raised."""
+
+    VIRT_EVENT = pygame.USEREVENT + 1
+
+    def __init__(self, n=1):
+        """Create vitrual event types for up, down, left, right."""
+        self.n = n
+
+    def get_virtual_events(self):
+        """Returns a tuple of the virtual events in the order of up, down, left right. This is meant to be passed along to the controls parameter of a snake."""
+        controls = []
+        for control in ('up', 'down', 'left', 'right'):
+            controls.append((self.n, control))
+        return controls
+
+    def post_events(self, *args, **kwargs):
+        """This is the method that will raise the virtual events. It calls on move_algorithm to decide which event to raise."""
+        movement = self.move_algorithm(*args, **kwargs)
+        if not (movement is None):
+            pygame.event.post(pygame.event.Event(self.VIRT_EVENT, n=self.n, dir=movement))
+
+    def move_algorithm(self):
+        """Defines when which event will be raised. This is the function to be overwritten in inheritance. Should return 'up', 'down', 'left', 'right', or None.
+
+        This default algorithm randomly decides to turn based on a constant percent chance."""
+        # Percent chance of a turn
+        turn_chance = 0.10
+
+        n = random.random()
+
+        # Of the 4 turns, only 2 will have an effect.
+        if n < (turn_chance * (1/4)):
+            return 'up'
+        elif n < (turn_chance * (1/2)):
+            return 'down'
+        elif n < (turn_chance * (3/4)):
+            return 'left'
+        elif n < turn_chance:
+            return 'right'
 
 
 def index_to_pixels(x, y):
