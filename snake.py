@@ -32,6 +32,8 @@ def main():
     while handle_events(players):
         clock.tick(5)
         for p in players:
+            if type(p) == SnakeNPC:
+                p.random_ch_dir()
             p.move(screen)
             p.draw(screen)
 
@@ -207,6 +209,24 @@ class Snake:
         """Change direction to right."""
         if not (self.dX == -1):
             self.dX, self.dY = 1, 0
+
+class SnakeNPC(Snake):
+    """An snake with no controls and changes direction randomly."""
+
+    def random_ch_dir(self):
+        """Use a weighted probability to decide if the snake should turn."""
+        n = random.randrange(10)
+
+        # 10% chance for each turn, 60% chance of nothing.
+        # Of these turns, only 2 will have an effect; totaling at 80% of nothing.
+        if n < 1:
+            self.up()
+        elif n < 2:
+            self.down()
+        elif n < 3:
+            self.left()
+        elif n < 4:
+            self.right()
 
 
 def index_to_pixels(x, y):
