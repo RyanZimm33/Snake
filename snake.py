@@ -117,10 +117,10 @@ def end_screen(screen, snake1, snake2):
     end = True
     while end:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                end = False
             if event.type == pygame.KEYDOWN:
-                if event.type == pygame.QUIT:
-                    end = False
-                elif event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE:
                     end = False
                 elif event.key == pygame.K_ESCAPE:
                     end = False
