@@ -24,6 +24,8 @@ def main():
     p2 = Snake(100, 100, controls=p2controls, color=(0, 255, 0))
     players = [p1, p2]
 
+    game_intro(screen)
+
     while handle_events(players):
         clock.tick(5)
         for p in players:
@@ -31,6 +33,18 @@ def main():
             p.draw(screen)
 
         pygame.display.update()
+
+def game_intro(screen):
+    intro =True
+    while (intro):
+        myfont = pygame.font.SysFont("Britannic Bold", 40)
+        nlabel = myfont.render("Welcome ", 1, (255, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    intro = False
+        screen.blit(nlabel,(200,200))
+        pygame.display.flip()
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
@@ -75,7 +89,8 @@ class Snake:
                 controls[0]: self.up,
                 controls[1]: self.down,
                 controls[2]: self.left,
-                controls[3]: self.right
+                controls[3]: self.right,
+                pygame.K_g: self.grow
             }
         except TypeError:
             self.ch_dir = dict()
@@ -86,9 +101,12 @@ class Snake:
         self.dY = 0
         self.tail = (0,0)
         self.color = color
+        self.growing = False
 
         self.body = [(X, Y)]
 
+    def grow(self):
+        self.growing = True
 
     def move(self):
         """Move one position."""
@@ -97,7 +115,12 @@ class Snake:
         self.Y = (self.Y + self.dY * cell_size) % screen_height
 
         self.body.append((self.X, self.Y))
-        self.tail = self.body.pop(0)
+
+        if not (self.growing):
+            self.tail = self.body.pop(0)
+        else:
+            self.growing = False
+
 
     def draw(self, screen):
         head = self.body[-1]
@@ -109,6 +132,9 @@ class Snake:
         pygame.draw.rect(screen, black, (tail[0], tail[1], cell_size-1, cell_size-1))
         # draw new head
         pygame.draw.rect(screen, self.color, (head[0], head[1], cell_size-1, cell_size-1))
+        # render
+        pygame.display.update()
+
 
 
     def up(self):
