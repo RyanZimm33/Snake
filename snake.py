@@ -15,12 +15,6 @@ def main():
     players = [p1]
 
     while handle_events(players):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                p1.ch_dir[event.key]()
-
         p1.move()
 
         pygame.display.update()
@@ -33,11 +27,9 @@ def handle_events(players):
     players : list
         List of snake players.
     """
-    running = True
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
-            break
+            return False
         elif event.type == pygame.KEYDOWN:
             for p in players:
                 try:
@@ -45,7 +37,7 @@ def handle_events(players):
                 except KeyError:
                     pass
 
-    return running
+    return True
 
 
 class Snake:
