@@ -1,19 +1,11 @@
 import random
 import pygame
 
-screen_width = 800
-screen_height = 600
-cell_size = 50
-# Number of seconds for a snake to cross the screen
-speed = 2
-
-blocks_x = screen_width // cell_size
-blocks_y = screen_height // cell_size
-
+import constants
 
 def main():
     """START GAME"""
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen = pygame.display.set_mode((constants.screen_width, constants.screen_height))
     clock = pygame.time.Clock()
 
     settings = game_intro(screen)
@@ -28,7 +20,7 @@ def game_loop(screen, clock, settings):
 
         try:
             while True:
-                clock.tick(blocks_x / speed)
+                clock.tick(constants.blocks_x / constants.speed)
 
                 for cont in controllers:
                     cont.post_events(map)
@@ -60,11 +52,11 @@ def game_setup(settings):
 
     Game_Mode = settings['Gamemode']
     difficulty = settings['Difficulty']
-    cell_size = 40
-    blocks_x = int(screen_width / cell_size)
-    blocks_y = int(screen_height / cell_size)
+    constants.cell_size = 40
+    constants.blocks_x = int(constants.screen_width / constants.cell_size)
+    constants.blocks_y = int(constants.screen_height / constants.cell_size)
 
-    map = Map(blocks_x, blocks_y)
+    map = Map(constants.blocks_x, constants.blocks_y)
     p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
     p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
 
@@ -346,8 +338,8 @@ class Fruit:
         self.map.fruits.append(self)
 
         while True:
-            self.x = random.randint(0, blocks_x - 1)
-            self.y = random.randint(0, blocks_y - 1)
+            self.x = random.randint(0, constants.blocks_x - 1)
+            self.y = random.randint(0, constants.blocks_y - 1)
             if map[self.y][self.x] == 0:
                 break
 
@@ -356,11 +348,11 @@ class Fruit:
         # Render the fruit
         x, y = index_to_pixels(self.x, self.y)
 
-        # fruit = pygame.Rect(x, y, cell_size, cell_size)
+        # fruit = pygame.Rect(x, y, constants.cell_size, constants.cell_size)
         # pygame.draw.rect(screen, (255, 0, 0), fruit)
 
         white = (255,255,255)
-        n = cell_size / 3
+        n = constants.cell_size / 3
         pygame.draw.rect(screen, white, (x + n, y, n, n))
         pygame.draw.rect(screen, white, (x, y + n, n, n))
         pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
@@ -382,19 +374,19 @@ class BigFruit(Fruit):
 
         while True:
             try_again = False
-            self.x = random.randint(0, blocks_x - 1)
-            self.y = random.randint(0, blocks_y - 1)
+            self.x = random.randint(0, constants.blocks_x - 1)
+            self.y = random.randint(0, constants.blocks_y - 1)
 
             # Check those new positions
             for point in self.get_points():
                 if map[point[1]][point[0]] != 0:
                     try_again = True
                     break
-                elif point[0] // (blocks_x-1):
+                elif point[0] // (constants.blocks_x-1):
                     # Goes over vertical edge
                     try_again = True
                     break
-                elif point[1] // (blocks_y-1):
+                elif point[1] // (constants.blocks_y-1):
                     # Goes over horizontal edge
                     try_again = True
                     break
@@ -412,7 +404,7 @@ class BigFruit(Fruit):
         x, y = index_to_pixels(self.x, self.y)
 
         white = (255, 255, 255)
-        n = (cell_size * self.size) / 3
+        n = (constants.cell_size * self.size) / 3
         pygame.draw.rect(screen, white, (x + n, y, n, n))
         pygame.draw.rect(screen, white, (x, y + n, n, n))
         pygame.draw.rect(screen, white, (x + 2*n, y + n, n, n))
@@ -425,7 +417,7 @@ class BigFruit(Fruit):
             if self.map[y][x] == self:
                 self.map[y][x] = 0
                 fruit_coord = index_to_pixels(x, y)
-                pygame.draw.rect(self.screen, (0, 0, 0), (fruit_coord[0], fruit_coord[1], cell_size, cell_size))
+                pygame.draw.rect(self.screen, (0, 0, 0), (fruit_coord[0], fruit_coord[1], constants.cell_size, constants.cell_size))
 
         BigFruit(self.screen, self.map)
 
@@ -434,8 +426,8 @@ class BigFruit(Fruit):
         points = []
         for dy in range(self.size):
             for dx in range(self.size):
-                x = (self.x + dx) % blocks_x
-                y = (self.y + dy) % blocks_y
+                x = (self.x + dx) % constants.blocks_x
+                y = (self.y + dy) % constants.blocks_y
                 points.append((x, y))
         return points
 
@@ -489,9 +481,9 @@ class Snake:
     def get_color(self):
         """Generate a color for the head by factoring in the x and y position."""
         x, y = index_to_pixels(self.X, self.Y)
-        r = self.color[0] or 150 + 100 * (x / screen_width)
-        g = self.color[1] or 100 + 150 * (y / screen_height)
-        b = self.color[2] or 150 + 100 * (x / screen_width)
+        r = self.color[0] or 150 + 100 * (x / constants.screen_width)
+        g = self.color[1] or 100 + 150 * (y / constants.screen_height)
+        b = self.color[2] or 150 + 100 * (x / constants.screen_width)
         return (int(r), int(g), int(b))
 
 
@@ -499,8 +491,8 @@ class Snake:
         """Move forward one cell. Check the map for collisions with snakes or fruits."""
         # The new coord modulo the max coord. This means the snake will wrap back to the beginning.
 
-        new_X = (self.X + self.dX) % blocks_x
-        new_Y = (self.Y + self.dY) % blocks_y
+        new_X = (self.X + self.dX) % constants.blocks_x
+        new_Y = (self.Y + self.dY) % constants.blocks_y
 
         obstacle = self.map[new_Y][new_X]
         self.collision_detect(obstacle, screen)
@@ -529,13 +521,13 @@ class Snake:
 
         # Erase tail
         tail_coord = index_to_pixels(tail[0], tail[1])
-        pygame.draw.rect(screen, black, (tail_coord[0], tail_coord[1], cell_size, cell_size))
+        pygame.draw.rect(screen, black, (tail_coord[0], tail_coord[1], constants.cell_size, constants.cell_size))
 
         # Draw new head
         head_coord = index_to_pixels(head[0], head[1])
-        # color = (100, 255 * (head_coord[0] / screen_width), 255 * (head_coord[1] / screen_height))
+        # color = (100, 255 * (head_coord[0] / constants.screen_width), 255 * (head_coord[1] / constants.screen_height))
         color = self.get_color()
-        pygame.draw.rect(screen, color, (head_coord[0], head_coord[1], cell_size-1, cell_size-1))
+        pygame.draw.rect(screen, color, (head_coord[0], head_coord[1], constants.cell_size-1, constants.cell_size-1))
 
         pygame.display.update()
 
@@ -717,14 +709,14 @@ def NPC_algo(fruit, snake):
 
 def index_to_pixels(x, y):
     """Convert the index coordinates to pixel coordinates. Returns (x, y) in pixels."""
-    new_x = x * cell_size
-    new_y = y * cell_size
+    new_x = x * constants.cell_size
+    new_y = y * constants.cell_size
     return new_x, new_y
 
 
 if __name__ == '__main__':
-    if (screen_width % cell_size) or (screen_height % cell_size):
-        raise Exception('screen_width and screen_height must be divisible by cell_size')
+    if (constants.screen_width % constants.cell_size) or (constants.screen_height % constants.cell_size):
+        raise Exception('constants.screen_width and constants.screen_height must be divisible by constants.cell_size')
 
     pygame.init()
     pygame.display.set_caption("Tron Snake")
