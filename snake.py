@@ -51,13 +51,17 @@ def game_intro(screen):
     intro =True
     while (intro):
         myfont = pygame.font.SysFont("Britannic Bold", 40)
-        nlabel = myfont.render("Welcome ", 1, (255, 0, 0))
+        myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+        title = myfont.render("Snake, but actually Tron", 1, (255, 0, 0))
+        under = myfont2.render("Press Space to Begin", 1, (255, 0, 0))
+        screen.blit(title,(30, 30))
+        screen.blit(under,(30, 80))
+        pygame.display.flip() 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     intro = False
-        screen.blit(nlabel,(200,200))
-        pygame.display.flip()
+                    screen.fill((0,0,0))
 
 def handle_events(players):
     """Iterate through events and send them to their proper handlers.
