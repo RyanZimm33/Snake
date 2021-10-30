@@ -3,14 +3,21 @@ import pygame
 
 import constants
 
+
 def main():
     """START GAME"""
     screen = pygame.display.set_mode((constants.screen_width, constants.screen_height))
     clock = pygame.time.Clock()
 
-    settings = game_intro(screen)
-    stats = game_loop(screen, clock, settings)
-    end_screen(screen, stats)
+    try:
+        settings = game_intro(screen)
+        stats = game_loop(screen, clock, settings)
+        return end_screen(screen, stats)
+    except Exception as e:
+        if str(e) == 'QUIT':
+            return False
+        else:
+            raise e
 
 
 def game_loop(screen, clock, settings):
@@ -26,7 +33,7 @@ def game_loop(screen, clock, settings):
                     cont.post_events(map)
 
                 if not handle_events(players):
-                    return None
+                    return []
 
                 for player in players:
                     player.move(screen)
@@ -91,10 +98,10 @@ def handle_events(players):
     """
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            return False
+            raise Exception('QUIT')
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                return False
+                raise Exception('QUIT')
             for p in players:
                 try:
                     p.ch_dir[event.key]()
@@ -149,7 +156,9 @@ def game_intro(screen):
 
         #Button events
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.QUIT:
+                raise Exception('QUIT')
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 #Start
                 if 30 <= mouse[0] <= 90 and 90 <= mouse[1] <= 130:
                     intro = False
@@ -158,10 +167,9 @@ def game_intro(screen):
                 #Options
                 if 120 <= mouse[0] <= 220 and 90 <= mouse[1] <= 130:
                     settings = optionScreen(screen)
-
                 #Exit
                 if 240 <= mouse[0] <= 300 and 90 <= mouse[1] <= 130:
-                    pygame.quit()
+                    raise Exception('QUIT')
 
         pygame.display.update()
 
@@ -244,7 +252,13 @@ def optionScreen(screen):
 
         #Button events
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.QUIT:
+                raise Exception('QUIT')
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    screen.fill((0,0,0))
+                    return settings
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 #Easy
                 if 30 <= mouse[0] <= 90 and 90 <= mouse[1] <= 130:
                     settings["Difficulty"] = 0
@@ -277,45 +291,56 @@ def optionScreen(screen):
 
         pygame.display.update()
 
-def end_screen(screen, stats):
-    if (len(stats) > 1):
-        snake1, snake2 = stats[0], stats[1]
-        """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
-        myfont = pygame.font.SysFont("Britannic Bold", 40)
-        myfont2 = pygame.font.SysFont("Britannic Bold", 30)
+def end_screen(screen, snakes):
+    """Screen displayed upon Game Over. Displays winner, loser and the points scored. Returns True if user restarts."""
+    myfont = pygame.font.SysFont("Britannic Bold", 40)
+    myfont2 = pygame.font.SysFont("Britannic Bold", 30)
 
+    scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
+    underline  = myfont.render("__________", 1, (255,0,0))
+
+    try:
+        snake1 = snakes[0]
+        score1 = myfont2.render(f"Player 1: {str(len(snake1.body))}", 1, (255, 0, 0))
+        screen.blit(score1, (30, 110))
+    except IndexError:
+        pass
+
+    try:
+        snake2 = snakes[1]
+        score2 = myfont2.render(f"Player 1: {str(len(snake2.body))}", 1, (255,0,0))
+        screen.blit(score2, (30, 110))
+    except IndexError:
+        pass
+
+    if len(snakes) == 2:
         if snake1.loser and not snake2.loser:
-            winner = myfont.render("Player 2 Wins!", 1, (255, 0,0))
+            winner = myfont.render("Player 2 Wins!", 1, (255, 0, 0))
         elif snake2.loser and not snake1.loser:
-            winner = myfont.render("Player 1 Wins!", 1, (255, 0,0))
+            winner = myfont.render("Player 1 Wins!", 1, (255, 0, 0))
         else:
-            winner = myfont.render("Tie", 1, (255, 0,0))
-
-        scoreboard = myfont.render("Scoreboard", 1, (255, 0,0))
-        underline  = myfont.render("__________", 1, (255,0,0))
-
-        score1 = myfont2.render("Player 1: " + str(len(snake1.body)), 1, (255,0,0))
-        score2 = myfont2.render("Player 2: " + str(len(snake2.body)), 1, (255,0,0))
+            winner = myfont.render("Tie", 1, (255, 0, 0))
 
         screen.blit(winner, (30, 30))
-        screen.blit(scoreboard, (30, 60))
-        screen.blit(underline, (30,80))
-        screen.blit(score1, (30, 110))
-        screen.blit(score2, (30, 140))
-        pygame.display.flip()
 
-        end = True
-        while end:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+    screen.blit(scoreboard, (30, 60))
+    screen.blit(underline, (30,80))
+    pygame.display.flip()
+
+    end = True
+    while end:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                end = False
+                return False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     end = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        end = False
-                    elif event.key == pygame.K_ESCAPE:
-                        end = False
-                    elif event.key == pygame.K_r:
-                        return True
+                    return False
+                else:
+                    end = False
+    # Automatically restart
+    return True
 
 def show_score(score_coords, score, screen):
     x, y = score_coords
