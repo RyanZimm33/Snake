@@ -2,8 +2,8 @@ import pygame
 
 screen_width = 800
 screen_height = 600
+clock = pygame.time.Clock()
 
-# While loop section
 def main():
     """Start game."""
     global pygame
@@ -11,21 +11,37 @@ def main():
 
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    p1 = Snake(100,100)
+    p1 = Snake(400, 300)
+    players = [p1]
 
-    running = True
-    while running:
-        #handle_events(pygame.event.get())
-
-
+    while handle_events(players):
+        clock.tick(5)
         p1.move()
+        p1.draw(screen)
 
         pygame.display.update()
 
+def handle_events(players):
+    """Iterate through events and send them to their proper handlers.
+
+    Parameters
+    ----------
+    players : list
+        List of snake players.
+    """
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return False
+        elif event.type == pygame.KEYDOWN:
+            for p in players:
+                try:
+                    p.ch_dir[event.key]()
+                except KeyError:
+                    pass
+
+    return True
 
 
-
-# Snake class section
 class Snake:
     """A snake with its own length and position."""
 
@@ -42,10 +58,10 @@ class Snake:
             The rgb color of the snake.
         """
         self.ch_dir = {
-            "k_UP": self.up,
-            "k_DOWN": self.down,
-            "k_LEFT": self.left,
-            "k_RIGHT": self.right
+            pygame.K_UP: self.up,
+            pygame.K_DOWN: self.down,
+            pygame.K_LEFT: self.left,
+            pygame.K_RIGHT: self.right
         }
 
         self.X = X
@@ -68,7 +84,7 @@ class Snake:
         # new_x = (self.xy[0] + self.velocity[0]) % screen_size[0]
         # new_y = (self.xy[1] + self.velocity[1]) % screen_size[1]
 
-        self.body.append(self.X, self.Y)
+        self.body.append((self.X, self.Y))
         self.tail = self.body.pop(0)
 
         # Draw new rectangle at self.xy
@@ -76,9 +92,9 @@ class Snake:
 
         print(self.body)
 
-    def draw(self):
-        head = self.body[len(self.body)]
-        tail = self.body[0]
+    def draw(self, screen):
+        head = self.body[-1]
+        tail = self.tail
 
         black = (0,0,0)
         white = (255,255,255)
@@ -104,6 +120,7 @@ class Snake:
     def right(self):
         """Move right."""
         self.dX, self.dY = 1, 0
+
 
 
 # Random generation section
