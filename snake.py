@@ -11,13 +11,19 @@ def main():
 
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    p1 = Snake(400, 300)
-    players = [p1]
+    # Up, down, left, right
+    p1controls = [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]
+    p2controls = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]
+
+    p1 = Snake(400, 300, controls=p1controls, color=(0, 0, 255))
+    p2 = Snake(100, 100, controls=p2controls, color=(0, 255, 0))
+    players = [p1, p2]
 
     while handle_events(players):
         clock.tick(5)
-        p1.move()
-        p1.draw(screen)
+        for p in players:
+            p.move()
+            p.draw(screen)
 
         pygame.display.update()
 
@@ -45,7 +51,7 @@ def handle_events(players):
 class Snake:
     """A snake with its own length and position."""
 
-    def __init__(self, X, Y, color=(0, 0, 255)):
+    def __init__(self, X, Y, *, controls=None, color=(255, 255, 255)):
         """Create snake.
 
         Parameters
@@ -57,12 +63,15 @@ class Snake:
         color : (int, int, int)
             The rgb color of the snake.
         """
-        self.ch_dir = {
-            pygame.K_UP: self.up,
-            pygame.K_DOWN: self.down,
-            pygame.K_LEFT: self.left,
-            pygame.K_RIGHT: self.right
-        }
+        try:
+            self.ch_dir = {
+                controls[0]: self.up,
+                controls[1]: self.down,
+                controls[2]: self.left,
+                controls[3]: self.right
+            }
+        except TypeError:
+            self.ch_dir = dict()
 
         self.X = X
         self.Y = Y
@@ -97,12 +106,11 @@ class Snake:
         tail = self.tail
 
         black = (0,0,0)
-        white = (255,255,255)
 
         # erase tail
         pygame.draw.rect(screen, black, (tail[0], tail[1], 50, 50))
         # draw new head
-        pygame.draw.rect(screen, white, (head[0], head[1], 50, 50))
+        pygame.draw.rect(screen, self.color, (head[0], head[1], 50, 50))
 
 
     def up(self):
