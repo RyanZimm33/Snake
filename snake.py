@@ -1,7 +1,10 @@
-import pygame
+import pygame, random
 
 screen_width = 800
 screen_height = 600
+cell_height_count = 12
+cell_width_count = 16
+cell_size = 50
 clock = pygame.time.Clock()
 
 def main():
@@ -17,6 +20,7 @@ def main():
     p1 = Snake(400, 300, controls=p1controls, color=(0, 0, 255))
     p2 = Snake(100, 100, controls=p2controls, color=(0, 255, 0))
     players = [p1, p2]
+    fruit = Fruit()
 
     game_intro(screen)
 
@@ -26,6 +30,9 @@ def main():
             p.move()
             p.draw(screen)
 
+        fruit.drawFruit(screen)
+        fruit.collision(p1.getX(), p1.getY())
+        fruit.collision(p2.getX(), p2.getY())
         pygame.display.update()
 
 def game_intro(screen):
@@ -59,6 +66,20 @@ def handle_events(players):
                     pass
 
     return True
+
+class Fruit:
+    def __init__(self):
+        self.x = random.randint(0, cell_width_count - 1)
+        self.y = random.randint(0, cell_height_count - 1)
+
+    def drawFruit(self, screen):
+        fruit = pygame.Rect(self.x * cell_size, self.y * cell_size, 50, 50)
+        pygame.draw.rect(screen ,(255, 0, 0), fruit)
+
+    def collision(self, xPos, yPos):
+        if self.x * cell_size == int(xPos) and self.y * cell_size == int(yPos):
+            self.x = random.randint(0, cell_width_count - 1)
+            self.y = random.randint(0, cell_height_count - 1)
 
 
 class Snake:
@@ -149,6 +170,12 @@ class Snake:
         """Change direction to right."""
         if not (self.dX == -1):
             self.dX, self.dY = 1, 0
+
+    def getX(self):
+        return self.X
+
+    def getY(self):
+        return self.Y
 
 
 # Random generation section
