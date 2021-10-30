@@ -27,7 +27,8 @@ def main():
 
     p1 = Snake(7, 5, map, controls=p1controls, color=(1, 0, 0))
     p2 = Snake(1, 1, map, controls=p2controls, color=(0, 1, 0))
-    players = [p1, p2]
+    pNPC = SnakeNPC(8, 8, map)
+    players = [p1, p2, pNPC]
 
     Fruit(screen, map)
 
@@ -35,6 +36,8 @@ def main():
         while handle_events(players):
             clock.tick(blocks_x / speed)
             for p in players:
+                if type(p) == SnakeNPC:
+                    p.random_ch_dir()
                 p.move(screen)
                 p.draw(screen)
 
@@ -225,14 +228,7 @@ class Snake:
         new_Y = (self.Y + self.dY) % blocks_y
 
         obstacle = self.map[new_Y][new_X]
-        if obstacle == 1:
-            self.loser = True
-            raise Exception("Game Over")
-        elif obstacle == 2:
-            # Apple Collision
-            Fruit(screen, self.map)
-            self.growing = True
-            self.score += 1
+        self.collision_detect(obstacle, screen)
 
         self.X = new_X
         self.Y = new_Y
@@ -266,6 +262,17 @@ class Snake:
 
         pygame.display.update()
 
+    def collision_detect(self, obstacle, screen):
+        """Detect collisions. If apple, grow. If snake, raise Exception('Game Over')."""
+        if obstacle == 1:
+            self.loser = True
+            raise Exception("Game Over")
+        elif obstacle == 2:
+            # Apple Collision
+            Fruit(screen, self.map)
+            self.growing = True
+            self.score += 1
+
 
     def up(self):
         """Change direction to up."""
@@ -292,18 +299,32 @@ class SnakeNPC(Snake):
 
     def random_ch_dir(self):
         """Use a weighted probability to decide if the snake should turn."""
-        n = random.randrange(10)
+        # Percent chance of a turn
+        turn_chance = 0.10
 
-        # 10% chance for each turn, 60% chance of nothing.
-        # Of these turns, only 2 will have an effect; totaling at 80% of nothing.
-        if n < 1:
+        n = random.random()
+        print(n)
+
+        # Of the 4 turns, only 2 will have an effect.
+        if n < (turn_chance * (1/4)):
             self.up()
-        elif n < 2:
+        elif n < (turn_chance * (1/2)):
             self.down()
-        elif n < 3:
+        elif n < (turn_chance * (3/4)):
             self.left()
-        elif n < 4:
+        elif n < turn_chance:
             self.right()
+
+    def collision_detect(self, obstacle, screen):
+        """Detect collisions. If apple, grow. If snake, raise Exception('Game Over')."""
+        if obstacle == 1:
+            # Destroy this snake
+            print('NPC Snake loses.')
+        elif obstacle == 2:
+            # Apple Collision
+            Fruit(screen, self.map)
+            self.growing = True
+            self.score += 1
 
 
 def index_to_pixels(x, y):
